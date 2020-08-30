@@ -140,12 +140,15 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="cluster.c" />
+    <ClCompile Include="division.c" />
     <ClCompile Include="powerIteration.c" />
     <ClCompile Include="spmat.c" />
+    <ClCompile Include="submat.c" />
     <ClCompile Include="test.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="spmat.h" />
+    <ClInclude Include="submat.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
