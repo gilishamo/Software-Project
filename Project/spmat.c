@@ -8,7 +8,7 @@
 
 void add_arr(struct _spmat*, const double*, int);
 void free_arr(struct _spmat*);
-void mult_arr(const struct _spmat*, const double*, double*);
+void mult_arr(const struct _spmat*, const double*, double*, int*, int);
 
 spmat* spmat_allocate_array(int n, int nnz) {
 	spmat* spmatArray;
@@ -40,6 +40,7 @@ spmat* spmat_allocate_array(int n, int nnz) {
 	spmatArray->add_row = &add_arr;
 	spmatArray->free = &free_arr;
 	spmatArray->mult = &mult_arr;
+	spmatArray->getVal = &getValArray;
 	spmatArray -> private = arrays;
 
 	(*spmatArray).n = n;
@@ -85,30 +86,53 @@ void free_arr(struct _spmat* A) {
 	return;
 }
 
+
 /* Multiplies matrix A by vector v, into result (result is pre-allocated) */
-void mult_arr(const struct _spmat* A, const double* v, double* result) {
+
+
+/*void mult_arr(const struct _spmat* A, const double* v, double* result) {
 	int i, j, n = A->n;
 	double sum;
 	void** arrays = (A-> private);
 	double* val = (double*)*(arrays);
 	int* col = (int*)*(arrays + 1);
 	int* rowArray = (int*)*(arrays + 2);
-	int nnz = *(rowArray + n);
 
-	for (j = 0; j < n - 1; j++) {
+	for (j = 0; j < n; j++) {
 		sum = 0;
 		for (i = *(rowArray + j); i < *(rowArray + j + 1); i++) {
-			nnz--;
 			sum = sum + (*(val + i)) * (*(v + *(col + i)));
 		}
 		*(result + j) = sum;
 	}
+}*/
 
-	sum = 0;
-	for (i = *(rowArray + n - 1); i <= nnz; i++) {
-		sum = sum + (*(val + i)) * (*(v + *(col + i)));
+void mult_arr(const struct _spmat* A, const double* v, double* result, int* nodes, int len) {
+	int i, j, k;
+	double sum;
+	void** arrays = (A-> private);
+	double* val = (double*)*(arrays);
+	int* col = (int*)*(arrays + 1);
+	int* rowArray = (int*)*(arrays + 2);
+
+	for (j = 0; j < len; j++) {
+		sum = 0;
+		k = 0;
+		for (i = *(rowArray + nodes[j]); i < *(rowArray + nodes[j] + 1); i++) {
+			if (k >= len) {
+				break;
+			}
+			while (k < len && *(col + i) > nodes[k]) {
+				k += 1;
+			}
+			if (nodes[k] == *(col + i))
+			{
+				sum = sum + (*(val + i)) * (*(v + k));
+				k += 1;
+			}
+		}
+		*(result + j) = sum;
 	}
-	*(result + n - 1) = sum;
 }
 
 
@@ -135,17 +159,20 @@ void readMatrixFileToSpmat(spmat* spmat, char* fileName) {
 	}
 }
 
-double getVal(spmat *mat, int i, int j) {
-	/*
-	int n = mat->n;
+double getValArray(spmat *mat, int i, int j) {
+	int n = mat->n, index;
 	void** arrays = (mat-> private);
-	int* val = (int*)*(arrays);
+	double* val = (double*)*(arrays);
 	int* col = (int*)*(arrays + 1);
 	int* rowArray = (int*)*(arrays + 2);
-	int nnz = *(rowArray + n);
-	*/
+
+	assert(i >= n || j >= n); /*replace with error*/
+	
+	for (index = *(rowArray + i); index < *(rowArray + i + 1); index++) {
+		if(*(col + index) == j){
+			return *(val + index);
+	}
+
 	return 0;
-
-
 }
 

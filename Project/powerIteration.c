@@ -5,29 +5,31 @@
 #include <stdio.h>
 #include<math.h>
 #include "spmat.h"
+#include "submat.h"
 
 void createRandomVector(double*, int);
 int calcDiff(double*, double*, int);
-double dotProdunt(double*, double*, int);
+double dotProduct(double*, double*, int);
 
-void powerIterationWithMatrixShifting(spmat *adjMat, double *expMatrix, int n, double* eigenVector, double* eigenValue, double norm) {
-	int i, j, k, diff = 0;
-	double magn;
+void powerIterationWithMatrixShifting(submat *modulMatrix, double* eigenVector, double* eigenValue) {
+	int i, j, k, diff = 0, n = modulMatrix->sizeOfSub;
+	double magn, norm;
 	double* tempVector;
-
 	
 	tempVector = (double*)malloc(n * sizeof(double));
 	assert(tempVector != NULL); /*replace with error*/
+
+	norm = norm1(modulMatrix);
 	
 	/*randomize b0*/
 	createRandomVector(tempVector, n);
 
 	/*power iteration*/
 	while (diff == 0) {
-		(*(adjMat->mult))(adjMat, tempVector, eigenVector);
+		(*(modulMatrix->mult))(modulMatrix, tempVector, eigenVector);
 
 		for (i = 0; i < n; i++) {
-			*(eigenVector + i) += dotProduct(expMatrix + i * n, tempVector, n) + norm * (*(tempVector + i));
+			*(eigenVector + i) += *(tempVector + i) * norm;
 		}
 
 		magn = sqrt(dotProduct(eigenVector, eigenVector, n));
@@ -44,10 +46,10 @@ void powerIterationWithMatrixShifting(spmat *adjMat, double *expMatrix, int n, d
 	
 	/*Computing the eigenValue*/
 
-	(*(adjMat->mult))(adjMat, eigenVector, tempVector);
+	(*(modulMatrix->mult))(modulMatrix, eigenVector, tempVector);
 
 	for (i = 0; i < n; i++) {
-		*(tempVector + i) += dotProduct(expMatrix + i * n, eigenVector, n);
+		*(tempVector + i) += *(eigenVector + i) * norm;
 	}
 
 	*eigenValue = (dotProduct(eigenVector, tempVector, n)) / (dotProduct(eigenValue, eigenValue, n)) - norm;
@@ -93,29 +95,14 @@ double dotProduct(double* row, double *col,  int len)
 	return magn;
 }
 
-double norm1(char* fileName, double* expMat) {
-	FILE* adjMat;
-	double sum, max = 0, *row;
-	int i, j, k, n;
-
-	adjMat = fopen(fileName, "r");
-	assert(adjMat != NULL);
-
-	for (i = 0; i < 2; i++) {
-		k = fread(&n, sizeof(int), 1, adjMat);
-		assert(k == 1);
-	}
-
-	row = (double*)malloc(n * sizeof(double));
-	assert(row != NULL);
+double norm1(submat *modulMat) {
+	double sum, max = 0;
+	int i, j, n = modulMat->sizeOfSub, *nodes = modulMat->nodes;
 
 	for (i = 0; i < n; i++) {
 		sum = 0;
-		k = fread(row, sizeof(double), n, adjMat);
-		assert(k == n);
-
 		for (j = 0; j < n; j++) {
-			sum += abs(*(row + j) + *(expMat + i * n + j));
+			sum += abs((*(modulMat->getVal))(modulMat, nodes[i], nodes[j]));
 		}
 
 		if (sum > max) {

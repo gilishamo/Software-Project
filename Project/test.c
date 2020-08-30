@@ -1,7 +1,135 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
+#include <assert.h>
+#include "spmat.h"
 
+int countNnz(char*);
+void readInputMatrix(spmat*, char*);
+
+
+int main(int argc, char* argv[]) {
+	FILE* inputFile, * vectorFile;
+	double* vector, * result;
+	spmat* mat;
+	int vLen;
+	int i, j, n, nnz, k, nodes[3] = { 0,1,3 };
+
+	inputFile = fopen(argv[1], "r");
+	assert(inputFile != NULL);
+	for (i = 0; i < 2; i++) {
+		k = fread(&n, sizeof(int), 1, inputFile);
+		assert(k == 1);
+	}
+
+	vectorFile = fopen(argv[2], "r");
+	assert(vectorFile != NULL);
+
+	k = fread(&j, sizeof(int), 1, vectorFile);
+	assert(k == 1);
+
+	k = fread(&vLen, sizeof(int), 1, vectorFile);
+	assert(k == 1);
+
+	vector = (double*)malloc(vLen * sizeof(double));
+	assert(vector != NULL);
+	result = (double*)malloc(vLen * sizeof(double));
+	assert(result != NULL);
+
+	k = fread(vector, sizeof(double), vLen, vectorFile);
+	assert(k == vLen);
+
+
+	printf("vector=\n");
+	for (i = 0; i < vLen; i++) {
+		printf("%f ", *(vector + i));
+	}
+	printf("\n");
+
+	nnz = countNnz(argv[1]);
+	mat = spmat_allocate_array(n, nnz);
+
+	readInputMatrix(mat, argv[1]);
+
+	(*(mat->mult))(mat, vector, result, nodes, vLen);
+
+	printf("result=\n");
+	for (i = 0; i < vLen; i++) {
+		printf("%f ", *(result + i));
+	}
+	printf("\n");
+
+	fclose(vectorFile);
+	fclose(inputFile);
+
+	free(vector);
+	free(result);
+
+	return 0;
+}
+
+int countNnz(char* filename) {
+	double* row;
+	int n, i, j, k, count = 0;
+	FILE* file;
+
+	file = fopen(filename, "r");
+	assert(file != NULL);
+
+	for (i = 0; i < 2; i++) {
+		k = fread(&n, sizeof(int), 1, file);
+		assert(k == 1);
+	}
+
+	row = (double*)malloc(n * sizeof(double));
+	assert(row != NULL);
+
+	for (i = 0; i < n; i++) {
+		k = fread(row, sizeof(double), n, file);
+		assert(k == n);
+		for (j = 0; j < n; j++) {
+			if (*(row + j) != 0) {
+				count++;
+			}
+		}
+	}
+
+	fclose(file);
+	free(row);
+
+	return count;
+}
+
+void readInputMatrix(spmat* spmat, char* fileName) {
+	int i, j, k, n;
+	double* row;
+	FILE* file;
+
+	file = fopen(fileName, "r");
+	assert(file != NULL);
+
+	for (i = 0; i < 2; i++) {
+		k = fread(&n, sizeof(int), 1, file);
+		assert(k == 1);
+	}
+
+	row = (double*)malloc(n * sizeof(double));
+	assert(row != NULL);
+
+	for (i = 0; i < n; i++) {
+		k = fread(row, sizeof(double), n, file);
+		assert(k == n);
+		printf("row num %d=\n", i);
+		for (j = 0; j < n; j++) {
+			printf("%f ", *(row + j));
+		}
+		printf("\n");
+		(*(spmat->add_row))(spmat, row, i);
+	}
+}
+
+
+/*
 void createInputFile(char *fileName, int numOfNodes) {
 	FILE* output;
 	int k, i, j, currDegree, currIndex = 0;
@@ -28,9 +156,8 @@ void createInputFile(char *fileName, int numOfNodes) {
 		assert(k == 1);
 
 		for (j = 0; j < currDegree; j++) {
-			/*generate sub group of index of size currDegree s.t all index are distinct and index != i*/
-		}
+			
+	}
 
 		free(neighbors);
-	}
-}
+	}*/
