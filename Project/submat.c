@@ -1,9 +1,12 @@
 #include <stdlib.h>
+#include <assert.h>
 #include "submat.h"
 #include "spmat.h"
 
 double* calculateF(submat*);
-
+double getValSubmat(struct _submat*, int, int);
+void freeSubmat(struct _submat*);
+void multSubMat(submat*, const double*, double*);
 
 submat* submat_allocate(spmat* adjMat, double* expMat, int* nodes, int n, int numOfNodes) {
 	submat* mat;
@@ -26,8 +29,8 @@ submat* submat_allocate(spmat* adjMat, double* expMat, int* nodes, int n, int nu
 }
 
 double getValSubmat(struct _submat* mat, int i, int j) {
-	int i, j, n = mat->sizeOfSub, *nodes = mat->nodes, numOfNodes = mat->numOfNodes;
-	double sum, *expMat, *f = mat->f, result = 0;
+	int numOfNodes = mat->numOfNodes;
+	double *expMat, *f = mat->f, result = 0;
 	spmat* adjMat;
 
 	expMat = mat->expMat;
@@ -47,6 +50,9 @@ double getValSubmat(struct _submat* mat, int i, int j) {
 void freeSubmat(struct _submat* mat) {
 	double* f = mat->f;
 
+	/*(*mat->adjMat->free)(mat->adjMat);
+	free((*mat->nodes));
+	free(mat->expMat);*/
 	free(f);
 	free(mat);
 }

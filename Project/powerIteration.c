@@ -10,9 +10,10 @@
 void createRandomVector(double*, int);
 int calcDiff(double*, double*, int);
 double dotProduct(double*, double*, int);
+double norm1(submat*);
 
 void powerIterationWithMatrixShifting(submat *modulMatrix, double* eigenVector, double* eigenValue) {
-	int i, j, k, diff = 0, n = modulMatrix->sizeOfSub;
+	int i, diff = 0, n = modulMatrix->sizeOfSub;
 	double magn, norm;
 	double* tempVector;
 	

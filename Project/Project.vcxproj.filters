@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="cluster.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="spmat.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -33,12 +30,30 @@
     <ClCompile Include="division.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="linkedlist.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="prog.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="spmat.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="submat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="powerIteration.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="division.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="linkedlist.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="makefile.txt">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

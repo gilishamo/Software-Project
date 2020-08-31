@@ -9,6 +9,7 @@
 void add_arr(struct _spmat*, const double*, int);
 void free_arr(struct _spmat*);
 void mult_arr(const struct _spmat*, const double*, double*, int*, int);
+double getValArray(struct _spmat*, int, int);
 
 spmat* spmat_allocate_array(int n, int nnz) {
 	spmat* spmatArray;
@@ -159,7 +160,7 @@ void readMatrixFileToSpmat(spmat* spmat, char* fileName) {
 	}
 }
 
-double getValArray(spmat *mat, int i, int j) {
+double getValArray(struct _spmat* mat, int i, int j) {
 	int n = mat->n, index;
 	void** arrays = (mat-> private);
 	double* val = (double*)*(arrays);
@@ -167,12 +168,13 @@ double getValArray(spmat *mat, int i, int j) {
 	int* rowArray = (int*)*(arrays + 2);
 
 	assert(i >= n || j >= n); /*replace with error*/
-	
+
 	for (index = *(rowArray + i); index < *(rowArray + i + 1); index++) {
-		if(*(col + index) == j){
+		if (*(col + index) == j) {
 			return *(val + index);
+		}
 	}
 
-	return 0;
+	return 0.0;
 }
 
