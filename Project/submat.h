@@ -1,3 +1,6 @@
+#ifndef _SUBMAT_H
+#define _SUBMAT_H
+
 #include "spmat.h"
 
 
@@ -31,4 +34,6 @@ typedef struct _submat {
 }submat;
 
 /*Allocates a new subMat*/
-submat* submat_allocate(submat* adjMat, double *expMat, int* nodes, int n, int numOfNodes);
+submat* submat_allocate(spmat* adjMat, double *expMat, int* nodes, int n, int numOfNodes);
+
+#endif 

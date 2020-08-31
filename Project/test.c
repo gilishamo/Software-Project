@@ -3,12 +3,63 @@
 #include <time.h>
 #include <assert.h>
 #include "spmat.h"
+#include "linkedlist.h"
 
 int countNnz(char*);
 void readInputMatrix(spmat*, char*);
 
 
 int main(int argc, char* argv[]) {
+	LinkedList *list;
+	int** vals, *f, *s, *t;
+	Node* temp;
+
+	vals = (int**)malloc(3 * sizeof(int*));
+	assert(vals != NULL);
+	f = (int*)malloc(sizeof(int));
+	assert(f != NULL);
+	s = (int*)malloc(sizeof(int));
+	assert(s != NULL);
+	t = (int*)malloc(sizeof(int));
+	assert(t != NULL);
+
+	*f = 1;
+	*s = 2;
+	*t = 3;
+
+	*(vals) = f;
+	*(vals + 1) = s;
+	*(vals + 2) = t;
+
+	list = allocate_LinkedList(vals, 3);
+
+	temp = list->head;
+	printf("list:\n");
+	do {
+		printf("%d ", *(temp->val));
+		temp = temp->next;
+	} while (temp != list->head);
+	printf("\n");
+
+	temp = (*list->DeleteNode)(list, list->head);
+
+	(*temp->free)(temp);
+
+	temp = list->head;
+	printf("list:\n");
+	do {
+		printf("%d ", *(temp->val));
+		temp = temp->next;
+	} while (temp != list->head);
+	printf("\n");
+
+	(*list->free)(list);
+
+	free(vals);
+
+	return 0;
+	
+	/*
 	FILE* inputFile, * vectorFile;
 	double* vector, * result;
 	spmat* mat;
@@ -66,6 +117,7 @@ int main(int argc, char* argv[]) {
 	free(result);
 
 	return 0;
+	*/
 }
 
 int countNnz(char* filename) {
