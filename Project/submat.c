@@ -38,7 +38,7 @@ double getValSubmat(struct _submat* mat, int i, int j) {
 
 	result += (*(adjMat->getVal))(adjMat, i, j);
 
-	result += *(expMat + i * numOfNodes + j);
+	result -= *(expMat + i * numOfNodes + j);
 
 	if (i == j) {
 		result -= *(f + i);
@@ -70,18 +70,18 @@ void multSubMat(submat* mat, const double* vector, double* result) {
 	/*Calculating adjMat * vector and storing the product in result*/
 	(*(adjMat->mult))(adjMat, vector, result, nodes, n); 
 	
-	/*Calculating expMat * vector and adding the product to result*/
+	/*Calculating expMat * vector and subtracting the product from result*/
 	for (i = 0; i < n; i++) {
 		sum = 0;
 
 		for (j = 0; j < n; j++) {
 			sum += *(expMat + nodes[i] * numOfNodes + nodes[j]) * *(vector + j);
 			if (i == j) {
-				sum -= *(f + i) * *(vector + j); 
+				sum += *(f + i) * *(vector + j); 
 			}
 		}
 
-		*(result + i) += sum;
+		*(result + i) -= sum;
 	}
 
 
