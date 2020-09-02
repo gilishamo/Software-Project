@@ -1,0 +1,13 @@
+﻿  linkedlist.c
+  prog.c
+C:\Users\Gili\source\repos\software-project\Project\prog.c(28,51): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Gili\source\repos\software-project\Project\prog.c(105,42): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Gili\source\repos\software-project\Project\prog.c(109,48): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Gili\source\repos\software-project\Project\prog.c(121,52): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Gili\source\repos\software-project\Project\prog.c(129,59): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Gili\source\repos\software-project\Project\prog.c(146,52): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Gili\source\repos\software-project\Project\prog.c(270,48): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Gili\source\repos\software-project\Project\prog.c(285,48): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Gili\source\repos\software-project\Project\prog.c(288,61): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+  Generating Code...
+  Project.vcxproj -> C:\Users\Gili\source\repos\software-project\x64\Debug\Project.exe

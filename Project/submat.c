@@ -3,10 +3,10 @@
 #include "submat.h"
 #include "spmat.h"
 
-double* calculateF(submat*);
+double* calculateF(spmat*, double*, int*, int, int);
 double getValSubmat(struct _submat*, int, int);
 void freeSubmat(struct _submat*);
-void multSubMat(submat*, const double*, double*);
+void multSubMat(struct _submat*, const double*, double*);
 
 submat* submat_allocate(spmat* adjMat, double* expMat, int* nodes, int n, int numOfNodes) {
 	submat* mat;
@@ -23,7 +23,7 @@ submat* submat_allocate(spmat* adjMat, double* expMat, int* nodes, int n, int nu
 	mat->nodes = nodes;
 	mat->sizeOfSub = n;
 	mat->numOfNodes = numOfNodes;
-	mat->f = calculateF(mat);
+	mat->f = calculateF(adjMat, expMat, nodes, n, numOfNodes);
 
 	return mat;
 }
@@ -57,7 +57,7 @@ void freeSubmat(struct _submat* mat) {
 	free(mat);
 }
 
-void multSubMat(submat* mat, const double* vector, double* result) {
+void multSubMat(struct _submat* mat, const double* vector, double* result) {
 	int i, j, n = mat->sizeOfSub;
 	int* nodes = mat->nodes, numOfNodes = mat->numOfNodes;
 	double sum;
@@ -87,19 +87,17 @@ void multSubMat(submat* mat, const double* vector, double* result) {
 
 }
 
-double* calculateF(submat *B) {
-	int n = B->sizeOfSub, numOfNodes = B->numOfNodes, *nodes = B->nodes;
+double* calculateF(spmat *adjMat, double *expMat, int* nodes, int sizeOfSub, int numOfNodes) {
 	int i, j;
-	double *expMat = B->expMat, *f;
-	spmat* adjMat = B->adjMat; 
+	double *f;
 
-	f = (double*)malloc(n * sizeof(double));
+	f = (double*)malloc(sizeOfSub * sizeof(double));
 	assert(f != NULL); /*replace with error*/
 
-	for (i = 0; i < n; i++) {
+	for (i = 0; i < sizeOfSub; i++) {
 		*(f + i) = 0;
-		for (j = 0; j < n; j++) {
-			*(f + i) += *(expMat + *(nodes + i) * numOfNodes + *(nodes + j));
+		for (j = 0; j < sizeOfSub; j++) {
+			*(f + i) += *(expMat + (*(nodes + i)) * numOfNodes + *(nodes + j));
 			*(f + i) +=(*(adjMat->getVal))(adjMat, nodes[i], nodes[j]);
 		}
 	}

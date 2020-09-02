@@ -143,7 +143,7 @@ void readMatrixFileToSpmat(spmat* spmat, char* fileName) {
 	FILE* file;
 
 	file = fopen(fileName, "r");
-	assert(file != NULL);
+	assert(file != NULL); /*re[lace with error*/
 
 	for (i = 0; i < 2; i++) {
 		k = fread(&n, sizeof(int), 1, file);
@@ -158,6 +158,10 @@ void readMatrixFileToSpmat(spmat* spmat, char* fileName) {
 		assert(k == n);
 		(*(spmat->add_row))(spmat, row, i);
 	}
+
+	fclose(file);
+
+	free(row);
 }
 
 double getValArray(struct _spmat* mat, int i, int j) {
@@ -167,7 +171,7 @@ double getValArray(struct _spmat* mat, int i, int j) {
 	int* col = (int*)*(arrays + 1);
 	int* rowArray = (int*)*(arrays + 2);
 
-	assert(i >= n || j >= n); /*replace with error*/
+	assert(i < n || j < n); /*replace with error*/
 
 	for (index = *(rowArray + i); index < *(rowArray + i + 1); index++) {
 		if (*(col + index) == j) {
