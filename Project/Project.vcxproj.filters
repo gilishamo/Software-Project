@@ -21,9 +21,6 @@
     <ClCompile Include="powerIteration.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="test.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="submat.c">
       <Filter>Source Files</Filter>
     </ClCompile>
