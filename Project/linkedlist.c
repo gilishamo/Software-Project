@@ -1,4 +1,3 @@
-#include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include "linkedlist.h"
@@ -14,7 +13,9 @@ Node* allocate_Node(int* nodes, int lenOfNodes, Node* next, Node* prev) {
 	Node* newNode;
 
 	newNode = (Node*)malloc(sizeof(Node));
-	assert(newNode != NULL); /*replace with error*/
+	if (newNode == NULL) {
+		exit(2);/*replace withh error*/
+	}
 
 	newNode->nodes = nodes;
 	newNode->lenOfNodes = lenOfNodes;
@@ -36,9 +37,13 @@ LinkedList* allocate_LinkedList(int* val, int n) {
 	int *listLen;
 
 	list = (LinkedList*)malloc(sizeof(LinkedList));
-	assert(list != NULL); /*replace with error*/
+	if (list == NULL) {
+		exit(2);/*replace withh error*/
+	}
 	listLen = (int*)malloc(sizeof(int));
-	assert(listLen != NULL);
+	if (listLen == NULL) {
+		exit(2);/*replace withh error*/
+	}
 	*listLen = 0;
 
 	list->head = NULL;

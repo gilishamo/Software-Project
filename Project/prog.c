@@ -1,4 +1,3 @@
-#include <assert.h> /*delete*/
 #include <stdlib.h>
 #include <stdio.h>
 #include "spmat.h"
@@ -20,25 +19,37 @@ int main(int argc, char* argv[]) {
 	double* expNumOfEdg;
 	LinkedList* P, * O;
 
-	assert(argc == 3); /*replace with error*/
+	if (argc != 3) {
+		exit(1);/*replace with error*/
+	}
 
 	inputFile = fopen(argv[1], "r");
-	assert(inputFile != NULL); /*replace with error*/
+	if (inputFile == NULL) {
+		exit(3);/*replace with error*/
+	}
 
 	k = fread(&numOfNodes, sizeof(int), 1, inputFile);
-	assert(k == 1); /*replace with error*/
+	if (k != 1) {
+		exit(4);/*replace with error*/
+	}
 
 	fclose(inputFile);
 
 	printf("numOfNodes=%d\n", numOfNodes);
 
 	degree = (int*)malloc(numOfNodes * sizeof(int));
-	assert(degree != NULL);/*replace with error*/
+	if (degree == NULL){
+		exit(2);/*replace with error*/
+	}
 	expNumOfEdg = (double*)malloc(numOfNodes * numOfNodes * sizeof(double));
-	assert(expNumOfEdg != NULL);/*replace with error*/
+	if (expNumOfEdg == NULL){
+		exit(2);/*replace with error*/
+	}
 	nodes = (int*)malloc(numOfNodes * sizeof(int));
-	assert(nodes != NULL);/*replace with error*/
-	
+	if (nodes == NULL){
+		exit(2);/*replace with error*/
+	}
+
 	readInputToAdjMatrixFile(argv[1], "adj_matrix", degree, &nnz);
 
 	adjMatrix = spmat_allocate_array(numOfNodes, nnz);
@@ -87,36 +98,53 @@ void readInputToAdjMatrixFile(char* input, char* output, int *degree, int *nnz) 
 	FILE* inputFile, * adjMatrixFile;
 
 	inputFile = fopen(input, "r");
-	assert(inputFile != NULL); /*replace with error*/
+	if (inputFile == NULL){
+		exit(3);/*replace with error*/
+	}
 	adjMatrixFile = fopen(output, "w");
-	assert(adjMatrixFile != NULL); /*replace with error*/
+	if (adjMatrixFile == NULL){
+		exit(3);/*replace with error*/
+	}
 
 	k = fread(&n, sizeof(int), 1, inputFile);
-	assert(k == 1); /*replace with error*/
+	if (k != 1) {
+		exit(4);/*replace with error*/
+	}
 
 	for (i = 0; i < 2; i++) {
 		k = fwrite(&n, sizeof(int), 1, adjMatrixFile);
-		assert(k == 1); /*replace with error*/
+		if (k != 1) {
+			exit(4);/*replace with error*/
+		}
 	}
 
 	row = (double*)malloc(n * sizeof(double));
-	assert(row != NULL); /*replace with error*/
+	if (row == NULL){
+		exit(2);/*replace with error*/
+	}
 	neighbors = (int*)malloc(n * sizeof(int));
-	assert(neighbors != NULL); /*replace with error*/
-
+	if (neighbors == NULL){
+		exit(2);/*replace with error*/
+	}
 
 	for (i = 0; i < n; i++) {
 		setToZero(row, n);
 		k = fread(&currDegree, sizeof(int), 1, inputFile);
-		assert(k == 1); /*replace with error*/
+		if (k != 1) {
+			exit(4);/*replace with error*/
+		}
 
 		*(degree + i) = currDegree;
 
 		printf("degree of node %d is %d\n", (i), currDegree);
 		*nnz += currDegree;
-		assert(currDegree <= n); /*replace with error*/
+		if (currDegree >= n) {
+			exit(6);/*replace with error*/
+		}
 		k = fread(neighbors, sizeof(int), currDegree, inputFile);
-		assert(k == currDegree); /*repace with error*/
+		if (k != currDegree) {
+			exit(4);/*replace with error*/
+		}
 		printf("neighbors are:\n");
 		for (j = 0; j < currDegree; j++) {
 			printf("%d", *(neighbors + j));
@@ -133,7 +161,9 @@ void readInputToAdjMatrixFile(char* input, char* output, int *degree, int *nnz) 
 		printf("\n");
 
 		k = fwrite(row, sizeof(double), n, adjMatrixFile);
-		assert(k == n); /*replace with error*/
+		if (k != n) {
+			exit(4);/*replace with error*/
+		}
 	}
 	
 	fclose(inputFile);
@@ -142,7 +172,6 @@ void readInputToAdjMatrixFile(char* input, char* output, int *degree, int *nnz) 
 	free(row);
 	free(neighbors);
 
-	printf("end of adjMat func\n");
 }
 
 void setToZero(double* row, int len) {
@@ -207,7 +236,9 @@ void  divideNetworkIntoModularityGroups(LinkedList *P, LinkedList *O, spmat * ad
 			int* nodes;
 
 			nodes = (int*)malloc(n * sizeof(int));
-			assert(nodes != NULL); /*replace with error*/
+			if (nodes == NULL) {
+				exit(2);/*replace with error*/
+			}
 
 			for (i = 0; i < n; i++) {
 				*(nodes + i) = *(g->nodes + i);
@@ -219,9 +250,13 @@ void  divideNetworkIntoModularityGroups(LinkedList *P, LinkedList *O, spmat * ad
 		else {
 			int* g1, * g2, index1 = 0, index2 = 0;
 			g1 = (int*)malloc(s1 * sizeof(int));
-			assert(g1 != NULL); /*replace with error*/
+			if (g1 == NULL) {
+				exit(2);/*replace with error*/
+			}
 			g2 = (int*)malloc(s2 * sizeof(int));
-			assert(g2 != NULL); /*replace with error*/
+			if (g2 == NULL) {
+				exit(2);/*replace with error*/
+			}
 
 
 			for (i = 0; i < n; i++) {
@@ -262,9 +297,14 @@ void writeToOutputFile(char* filename, LinkedList *O) {
 	Node* currNode;
 
 	outputFile = fopen(filename, "w");
+	if (outputFile == NULL) {
+		exit(3);
+	}
 
 	k = fwrite(O->len, sizeof(int), 1, outputFile);
-	assert(k == 1); /*replace withh error*/
+	if (k != 1) {
+		exit(4);/*replace withh error*/
+	}
 
 	printf("output:\n");
 	printf("num of groups: %d\n", *(O->len));
@@ -279,10 +319,14 @@ void writeToOutputFile(char* filename, LinkedList *O) {
 		size = currNode->lenOfNodes;
 		printf("size of group=%d " , size);
 		k = fwrite(&size, sizeof(int), 1, outputFile);
-		assert(k == 1); /*replace withh error*/
+		if (k != 1) {
+			exit(4);/*replace withh error*/
+		}
 
 		k = fwrite(currNode->nodes, sizeof(int), size, outputFile);
-		assert(k == size); /*replace withh error*/
+		if (k != size) {
+			exit(4);/*replace withh error*/
+		}
 
 		for (j = 0; j < size; j++) {
 			printf(" %d ", *(currNode->nodes + j));

@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include <assert.h>
+#include <stdio.h>
 #include "submat.h"
 #include "spmat.h"
 
@@ -12,7 +12,9 @@ submat* submat_allocate(spmat* adjMat, double* expMat, int* nodes, int n, int nu
 	submat* mat;
 
 	mat = (submat*)malloc(sizeof(submat));
-	assert(mat != NULL); /*replace with error*/
+	if (mat == NULL) {
+		exit(2);/*replace withh error*/
+	}
 
 	mat->free = &freeSubmat;
 	mat->mult = &multSubMat;
@@ -58,8 +60,7 @@ void freeSubmat(struct _submat* mat) {
 }
 
 void multSubMat(struct _submat* mat, const double* vector, double* result) {
-	int i, j, n = mat->sizeOfSub;
-	int* nodes = mat->nodes, numOfNodes = mat->numOfNodes;
+	int i, j, n = mat->sizeOfSub, * nodes = mat->nodes, numOfNodes = mat->numOfNodes;
 	double sum;
 	double* expMat, *f = mat->f;
 	spmat* adjMat;
@@ -83,8 +84,6 @@ void multSubMat(struct _submat* mat, const double* vector, double* result) {
 
 		*(result + i) -= sum;
 	}
-
-
 }
 
 double* calculateF(spmat *adjMat, double *expMat, int* nodes, int sizeOfSub, int numOfNodes) {
@@ -92,7 +91,9 @@ double* calculateF(spmat *adjMat, double *expMat, int* nodes, int sizeOfSub, int
 	double *f;
 
 	f = (double*)malloc(sizeOfSub * sizeof(double));
-	assert(f != NULL); /*replace with error*/
+	if (f == NULL) {
+		exit(2);/*replace with error*/
+	}
 
 	for (i = 0; i < sizeOfSub; i++) {
 		*(f + i) = 0;
