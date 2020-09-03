@@ -31,8 +31,6 @@ double* divideIntoTwo(submat *modulMat) {
 
 	powerIterationWithMatrixShifting(modulMat, eigenVector, eigenValue);
 
-	printf(" eigenValue = %f \n ", *eigenValue);
-
 	if (*eigenValue <= 0) {
 		free(eigenValue);
 		free(eigenVector);

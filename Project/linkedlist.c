@@ -9,6 +9,8 @@ void deleteTailLL(struct _LinkedList*);
 void freeLinkedList(struct _LinkedList*);
 void freeNode(struct _Node* node);
 
+typedef DATA;
+
 Node* allocate_Node(int* nodes, int lenOfNodes, Node* next, Node* prev) {
 	Node* newNode;
 
@@ -131,18 +133,6 @@ void deleteNodeLL(struct _LinkedList* list, Node* node){
 	}
 
 	if (node == list->tail) {
-		/*if (*(list->len) == 1) { same case as before
-			list->head = NULL;
-			list->tail = NULL;
-			node->prev = NULL;
-			node->next = NULL;
-
-			(*len)--;
-
-			(*node->free)(node);
-			return;
-		}*/
-
 		list->tail = node->prev;
 	}
 

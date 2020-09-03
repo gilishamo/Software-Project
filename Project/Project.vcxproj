@@ -145,7 +145,6 @@
     <ClCompile Include="powerIteration.c" />
     <ClCompile Include="spmat.c" />
     <ClCompile Include="submat.c" />
-    <ClCompile Include="test.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="division.h" />
