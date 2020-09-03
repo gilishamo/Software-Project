@@ -9,22 +9,24 @@
 void readInputMatrix(spmat*, char*);
 void setToZero(int*, int);*/
 
-
+/*
 int main(int argc, char* argv[]) {
 	FILE* inp;
 	int k, * nodes, degree, sumOfNodes;
 
-	assert(argc == 2);
+	if (argc != 2) {
+		exit(1);
+	}
 
 	inp = fopen(argv[1], "w");
 	assert(inp != NULL);
 
-	sumOfNodes = 10;
+	sumOfNodes = 6;
 
 	k = fwrite(&sumOfNodes, sizeof(int), 1, inp);
 	assert(k == 1);
 
-	/*
+
 	degree = 1;
 	nodes = (int*)malloc(degree * sizeof(int));
 	assert(nodes != NULL);
@@ -92,9 +94,9 @@ int main(int argc, char* argv[]) {
 
 	fclose(inp);
 
-	return 0; */
-
-
+	return 0;
+} */
+/*
 	degree = 3;
 	nodes = (int*)malloc(degree * sizeof(int));
 	assert(nodes != NULL);
@@ -211,7 +213,7 @@ int main(int argc, char* argv[]) {
 	fclose(inp);
 
 	return 0;
-}
+}*/
 
 	/*LinkedList *list;
 	int** vals, *f, *s, *t;

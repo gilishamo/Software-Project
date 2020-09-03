@@ -3,7 +3,6 @@
 #include <time.h>
 #include <math.h>
 #include <stdlib.h>
-#include <assert.h>
 #include "spmat.h"
 
 void add_arr(struct _spmat*, const double*, int);
@@ -18,15 +17,25 @@ spmat* spmat_allocate_array(int n, int nnz) {
 	void** arrays;
 
 	arrays = malloc(4 * sizeof(void*));
-	assert(arrays != NULL); /*replace with error*/
+	if (arrays == NULL) {
+		exit(2); /*replace with error*/
+	}
 	val = (double*)malloc(nnz * sizeof(double));
-	assert(val != NULL); /*replace with error*/
+	if (val == NULL) {
+		exit(2); /*replace with error*/
+	}
 	col = (int*)malloc(nnz * sizeof(int));
-	assert(col != NULL); /*replace with error*/
+	if (col == NULL) {
+		exit(2); /*replace with error*/
+	}
 	row = (int*)malloc((n + 1) * sizeof(int));
-	assert(row != NULL); /*replace with error*/
+	if (row == NULL) {
+		exit(2); /*replace with error*/
+	}
 	index = (int*)malloc(sizeof(int));
-	assert(index != NULL); /*replace with error*/
+	if (index == NULL) {
+		exit(2); /*replace with error*/
+	}
 
 	*(index) = 0;
 
@@ -36,7 +45,9 @@ spmat* spmat_allocate_array(int n, int nnz) {
 	*(arrays + 3) = index;
 
 	spmatArray = (spmat*)malloc(sizeof(spmat));
-	assert(spmatArray != NULL);
+	if (spmatArray == NULL) {
+		exit(2); /*replace with error*/
+	}
 
 	spmatArray->add_row = &add_arr;
 	spmatArray->free = &free_arr;
@@ -143,19 +154,27 @@ void readMatrixFileToSpmat(spmat* spmat, char* fileName) {
 	FILE* file;
 
 	file = fopen(fileName, "r");
-	assert(file != NULL); /*re[lace with error*/
+	if (file == NULL) {
+		exit(3); /*replace with error*/
+	}
 
 	for (i = 0; i < 2; i++) {
 		k = fread(&n, sizeof(int), 1, file);
-		assert(k == 1);
+		if (k != 1) {
+			exit(4); /*replace with error*/
+		}
 	}
 
 	row = (double*)malloc(n * sizeof(double));
-	assert(row != NULL);
+	if (row == NULL) {
+		exit(2); /*replace with error*/
+	}
 
 	for (i = 0; i < n; i++) {
 		k = fread(row, sizeof(double), n, file);
-		assert(k == n);
+		if (k != n) {
+			exit(4); /*replace with error*/
+		}
 		(*(spmat->add_row))(spmat, row, i);
 	}
 
@@ -171,7 +190,9 @@ double getValArray(struct _spmat* mat, int i, int j) {
 	int* col = (int*)*(arrays + 1);
 	int* rowArray = (int*)*(arrays + 2);
 
-	assert(i < n || j < n); /*replace with error*/
+	if(i >= n || j >= n) {
+		exit(5);
+	}
 
 	for (index = *(rowArray + i); index < *(rowArray + i + 1); index++) {
 		if (*(col + index) == j) {

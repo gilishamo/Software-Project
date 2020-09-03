@@ -1,5 +1,4 @@
-#include <assert.h>
-# include <stdlib.h>
+#include <stdlib.h>
 #include <time.h>
 #include <string.h>
 #include <stdio.h>
@@ -18,7 +17,9 @@ void powerIterationWithMatrixShifting(submat *modulMatrix, double* eigenVector, 
 	double* tempVector;
 	
 	tempVector = (double*)malloc(n * sizeof(double));
-	assert(tempVector != NULL); /*replace with error*/
+	if (tempVector == NULL) {
+		exit(2);/*replace withh error*/
+	}
 
 	norm = norm1(modulMatrix);
 
@@ -34,6 +35,9 @@ void powerIterationWithMatrixShifting(submat *modulMatrix, double* eigenVector, 
 		}
 
 		magn = sqrt(dotProduct(eigenVector, eigenVector, n));
+		if (magn == 0) {
+			exit(7);
+		}
 		for (i = 0; i < n; i++) {
 			*(eigenVector + i) /= magn;
 		}
@@ -53,7 +57,7 @@ void powerIterationWithMatrixShifting(submat *modulMatrix, double* eigenVector, 
 		*(tempVector + i) += *(eigenVector + i) * norm;
 	}
 
-	*eigenValue = ((dotProduct(eigenVector, tempVector, n)) / (dotProduct(eigenValue, eigenValue, n))) - norm;
+	*eigenValue = ((dotProduct(eigenVector, tempVector, n)) / (dotProduct(eigenVector, eigenVector, n))) - norm;
 
 	free(tempVector);
 
@@ -87,13 +91,13 @@ int calcDiff(double* vector, double* newVector, int n)
 double dotProduct(double* row, double *col,  int len)
 {
 	int i;
-	double magn = 0;
+	double product = 0;
 	for (i = 0; i < len; i++)
 	{
-		magn += row[i] * col[i];
+		product += row[i] * col[i];
 	}
 
-	return magn;
+	return product;
 }
 
 double norm1(submat *modulMat) {

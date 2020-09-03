@@ -1,6 +1,5 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <assert.h>
 #include "submat.h"
 #include "powerIteration.h"
 
@@ -12,17 +11,27 @@ double* divideIntoTwo(submat *modulMat) {
 	int n = modulMat->sizeOfSub;
 
 	eigenVector = (double*)malloc(n * sizeof(double));
-	assert(eigenVector != NULL); /*replace with error*/
+	if (eigenVector == NULL){
+		exit(2);/*replace with error*/
+	}
 	eigenValue = (double*)malloc(sizeof(double));
-	assert(eigenValue != NULL); /*replace with error*/
+	if (eigenValue == NULL){
+		exit(2);/*replace with error*/
+	}
 	division = (double*)malloc(n * sizeof(double));
-	assert(division != NULL); /*replace with error*/
+	if (division == NULL){
+		exit(2);/*replace with error*/
+	}
 	tempVector = (double*)malloc(n * sizeof(double));
-	assert(tempVector != NULL); /*replace with error*/
+	if (tempVector == NULL){
+		exit(2);/*replace with error*/
+	}
 
 	setToTrivialDivision(division, n);
 
 	powerIterationWithMatrixShifting(modulMat, eigenVector, eigenValue);
+
+	printf(" eigenValue = %f \n ", *eigenValue);
 
 	if (*eigenValue <= 0) {
 		free(eigenValue);

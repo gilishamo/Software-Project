@@ -1,3 +1,15 @@
-﻿  powerIteration.c
-C:\Users\Gili\source\repos\software-project\Project\powerIteration.c(67,18): warning C4244: 'function': conversion from 'time_t' to 'unsigned int', possible loss of data
+﻿  prog.c
+C:\Users\Gili\source\repos\software-project\Project\prog.c(31,51): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Gili\source\repos\software-project\Project\prog.c(109,42): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Gili\source\repos\software-project\Project\prog.c(115,48): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Gili\source\repos\software-project\Project\prog.c(132,52): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Gili\source\repos\software-project\Project\prog.c(144,59): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Gili\source\repos\software-project\Project\prog.c(163,52): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Gili\source\repos\software-project\Project\prog.c(304,48): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Gili\source\repos\software-project\Project\prog.c(321,48): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Gili\source\repos\software-project\Project\prog.c(326,61): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+  spmat.c
+C:\Users\Gili\source\repos\software-project\Project\spmat.c(162,38): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Gili\source\repos\software-project\Project\spmat.c(174,42): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+  Generating Code...
   Project.vcxproj -> C:\Users\Gili\source\repos\software-project\x64\Debug\Project.exe
