@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <assert.h>
 #include "submat.h"
 #include "powerIteration.h"
@@ -36,7 +37,6 @@ double* divideIntoTwo(submat *modulMat) {
 	temp = dotProduct(division, tempVector, n);
 
 	if (temp <= 0) {
-
 		setToTrivialDivision(division, n);
 
 		free(eigenValue);

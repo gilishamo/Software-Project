@@ -97,7 +97,7 @@ double* calculateF(spmat *adjMat, double *expMat, int* nodes, int sizeOfSub, int
 	for (i = 0; i < sizeOfSub; i++) {
 		*(f + i) = 0;
 		for (j = 0; j < sizeOfSub; j++) {
-			*(f + i) += *(expMat + (*(nodes + i)) * numOfNodes + *(nodes + j));
+			*(f + i) -= *(expMat + (*(nodes + i)) * numOfNodes + *(nodes + j));
 			*(f + i) +=(*(adjMat->getVal))(adjMat, nodes[i], nodes[j]);
 		}
 	}
