@@ -21,7 +21,7 @@ void powerIterationWithMatrixShifting(submat *modulMatrix, double* eigenVector, 
 	assert(tempVector != NULL); /*replace with error*/
 
 	norm = norm1(modulMatrix);
-	
+
 	/*randomize b0*/
 	createRandomVector(tempVector, n);
 
@@ -53,7 +53,7 @@ void powerIterationWithMatrixShifting(submat *modulMatrix, double* eigenVector, 
 		*(tempVector + i) += *(eigenVector + i) * norm;
 	}
 
-	*eigenValue = (dotProduct(eigenVector, tempVector, n)) / (dotProduct(eigenValue, eigenValue, n)) - norm;
+	*eigenValue = ((dotProduct(eigenVector, tempVector, n)) / (dotProduct(eigenValue, eigenValue, n))) - norm;
 
 	free(tempVector);
 
@@ -103,9 +103,8 @@ double norm1(submat *modulMat) {
 	for (i = 0; i < n; i++) {
 		sum = 0;
 		for (j = 0; j < n; j++) {
-			sum += abs((*(modulMat->getVal))(modulMat, nodes[i], nodes[j]));
+			sum += fabs((*(modulMat->getVal))(modulMat, nodes[j], nodes[i]));
 		}
-
 		if (sum > max) {
 			max = sum;
 		}

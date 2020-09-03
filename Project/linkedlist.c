@@ -109,10 +109,7 @@ void insertFirstLL(struct _LinkedList* list, int* new_val, int lenOfVal) {
 void deleteNodeLL(struct _LinkedList* list, Node* node){
 	int* len = list->len;
 
-	printf("yes");
-
 	if (node == list->head) {
-		printf("1");
 		if (*(list->len) == 1) {
 			list->head = NULL;
 			list->tail = NULL;
@@ -129,9 +126,7 @@ void deleteNodeLL(struct _LinkedList* list, Node* node){
 	}
 
 	if (node == list->tail) {
-		printf("2");
-		printf("%d\n", *(list->len));
-		if (*(list->len) == 1) {
+		/*if (*(list->len) == 1) { same case as before
 			list->head = NULL;
 			list->tail = NULL;
 			node->prev = NULL;
@@ -139,16 +134,12 @@ void deleteNodeLL(struct _LinkedList* list, Node* node){
 
 			(*len)--;
 
-			printf("in delete\n");
-
 			(*node->free)(node);
 			return;
-		}
+		}*/
 
 		list->tail = node->prev;
 	}
-
-	printf("yes");
 
 	(node->prev)->next = node->next;
 	(node->next)->prev = node->prev;

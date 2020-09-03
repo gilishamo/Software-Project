@@ -41,8 +41,6 @@ int main(int argc, char* argv[]) {
 	
 	readInputToAdjMatrixFile(argv[1], "adj_matrix", degree, &nnz);
 
-	printf("after\n");
-
 	adjMatrix = spmat_allocate_array(numOfNodes, nnz);
 
 	/* Calls add_row n times in order to initialize the values of spmat*/
@@ -53,12 +51,8 @@ int main(int argc, char* argv[]) {
 		sumOfDegrees += *(degree + i);
 	}
 
-	printf("sum of degree\n");
-
 	/*Calculates the expected number of edges between i and j for i,j= 0,...,n-1 and insert to mat*/
 	createExpMat(expNumOfEdg, degree, numOfNodes, sumOfDegrees);
-
-	printf("created mat \n");
 
 	for (i = 0; i < numOfNodes; i++) {
 		*(nodes + i) = i;
@@ -70,15 +64,10 @@ int main(int argc, char* argv[]) {
 	P = allocate_LinkedList(nodes, numOfNodes);
 	O = allocate_LinkedList(NULL, 0);
 
-	printf("before divide \n");
-
 	divideNetworkIntoModularityGroups(P, O, adjMatrix, expNumOfEdg, numOfNodes);
 
-	printf("after divide \n");
 
 	writeToOutputFile(argv[2], O);
-
-	printf("end\n");
 
 	/*free(nodes);*/
 	free(degree);
@@ -178,7 +167,7 @@ void createExpMat(double* expNumOfEdg, int* degree, int numOfNodes, int sumOfDeg
 
 void  divideNetworkIntoModularityGroups(LinkedList *P, LinkedList *O, spmat * adjMatrix, double* expNumOfEdg, int numOfNodes){
 	submat* modulMat;
-	int i, count = 0;
+	int i, j, count = 0;
 	Node* g;
 
 	while (*(P->len)) {
@@ -190,16 +179,23 @@ void  divideNetworkIntoModularityGroups(LinkedList *P, LinkedList *O, spmat * ad
 
 		g = P->tail;
 
-		printf("deleted node");
-
 		n = g->lenOfNodes;
 
 		modulMat = submat_allocate(adjMatrix, expNumOfEdg, g->nodes, n, numOfNodes);
 
+		printf("submat=\n");
+		for (i = 0; i < n; i++) {
+			printf("row num %d= ", g->nodes[i]);
+			for (j = 0; j < n; j++) {
+				printf(" %f ", (*modulMat->getVal)(modulMat, g->nodes[i], g->nodes[j]));
+			}
+			printf("\n");
+		}
+
 		division = divideIntoTwo(modulMat);
 
 		for (i = 0; i < n; i++) {
-			if (*(division + i)) {
+			if (*(division + i) == 1.0) {
 				s1++;
 			}
 			else {
@@ -229,7 +225,7 @@ void  divideNetworkIntoModularityGroups(LinkedList *P, LinkedList *O, spmat * ad
 
 
 			for (i = 0; i < n; i++) {
-				if (*(division + i)) {
+				if (*(division + i) == 1.0) {
 					*(g1 + index1) = *((g->nodes) + i);
 					index1++;
 				}
@@ -254,7 +250,7 @@ void  divideNetworkIntoModularityGroups(LinkedList *P, LinkedList *O, spmat * ad
 			}
 		}
 
-		(*P->deleteTail)(P);
+		(*P->deleteNode)(P, g);
 		free(division);
 		(*modulMat->free)(modulMat);
 	}
