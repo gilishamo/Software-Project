@@ -98,27 +98,6 @@ void free_arr(struct _spmat* A) {
 	return;
 }
 
-
-/* Multiplies matrix A by vector v, into result (result is pre-allocated) */
-
-
-/*void mult_arr(const struct _spmat* A, const double* v, double* result) {
-	int i, j, n = A->n;
-	double sum;
-	void** arrays = (A-> private);
-	double* val = (double*)*(arrays);
-	int* col = (int*)*(arrays + 1);
-	int* rowArray = (int*)*(arrays + 2);
-
-	for (j = 0; j < n; j++) {
-		sum = 0;
-		for (i = *(rowArray + j); i < *(rowArray + j + 1); i++) {
-			sum = sum + (*(val + i)) * (*(v + *(col + i)));
-		}
-		*(result + j) = sum;
-	}
-}*/
-
 void mult_arr(const struct _spmat* A, const double* v, double* result, int* nodes, int len) {
 	int i, j, k;
 	double sum;

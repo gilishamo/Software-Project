@@ -52,9 +52,6 @@ double getValSubmat(struct _submat* mat, int i, int j) {
 void freeSubmat(struct _submat* mat) {
 	double* f = mat->f;
 
-	/*(*mat->adjMat->free)(mat->adjMat);
-	free((*mat->nodes));
-	free(mat->expMat);*/
 	free(f);
 	free(mat);
 }

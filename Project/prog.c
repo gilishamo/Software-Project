@@ -35,8 +35,6 @@ int main(int argc, char* argv[]) {
 
 	fclose(inputFile);
 
-	printf("numOfNodes=%d\n", numOfNodes);
-
 	degree = (int*)malloc(numOfNodes * sizeof(int));
 	if (degree == NULL){
 		exit(2);/*replace with error*/
@@ -68,9 +66,6 @@ int main(int argc, char* argv[]) {
 	for (i = 0; i < numOfNodes; i++) {
 		*(nodes + i) = i;
 	}
-
-	printf("num of nodes = %d \n", numOfNodes);
-
 
 	P = allocate_LinkedList(nodes, numOfNodes);
 	O = allocate_LinkedList(NULL, 0);
@@ -136,7 +131,6 @@ void readInputToAdjMatrixFile(char* input, char* output, int *degree, int *nnz) 
 
 		*(degree + i) = currDegree;
 
-		printf("degree of node %d is %d\n", (i), currDegree);
 		*nnz += currDegree;
 		if (currDegree >= n) {
 			exit(6);/*replace with error*/
@@ -145,20 +139,10 @@ void readInputToAdjMatrixFile(char* input, char* output, int *degree, int *nnz) 
 		if (k != currDegree) {
 			exit(4);/*replace with error*/
 		}
-		printf("neighbors are:\n");
-		for (j = 0; j < currDegree; j++) {
-			printf("%d", *(neighbors + j));
-		}
-		printf("\n");
+		
 		for (j = 0; j < currDegree; j++) {
 			row[neighbors[j]] = 1.0;
 		}
-
-		printf("row num %d of matrix is:", i);
-		for (j = 0; j < n; j++) {
-			printf("%f", *(row + j));
-		}
-		printf("\n");
 
 		k = fwrite(row, sizeof(double), n, adjMatrixFile);
 		if (k != n) {
@@ -196,30 +180,17 @@ void createExpMat(double* expNumOfEdg, int* degree, int numOfNodes, int sumOfDeg
 
 void  divideNetworkIntoModularityGroups(LinkedList *P, LinkedList *O, spmat * adjMatrix, double* expNumOfEdg, int numOfNodes){
 	submat* modulMat;
-	int i, j, count = 0;
+	int i, n, s1 = 0, s2 = 0;;
+	double* division;
 	Node* g;
 
 	while (*(P->len)) {
-		int n, s1 = 0, s2 = 0;
-		double* division;
-
-		printf("loop num %d\n", count);
-		count++;
-
+	
 		g = P->tail;
 
 		n = g->lenOfNodes;
 
 		modulMat = submat_allocate(adjMatrix, expNumOfEdg, g->nodes, n, numOfNodes);
-
-		printf("submat=\n");
-		for (i = 0; i < n; i++) {
-			printf("row num %d= ", g->nodes[i]);
-			for (j = 0; j < n; j++) {
-				printf(" %f ", (*modulMat->getVal)(modulMat, g->nodes[i], g->nodes[j]));
-			}
-			printf("\n");
-		}
 
 		division = divideIntoTwo(modulMat);
 
@@ -243,7 +214,6 @@ void  divideNetworkIntoModularityGroups(LinkedList *P, LinkedList *O, spmat * ad
 			for (i = 0; i < n; i++) {
 				*(nodes + i) = *(g->nodes + i);
 			}
-			printf("g is indivisible\n");
 			(*O->insertLast)(O, nodes, n);
 		}
 
@@ -293,7 +263,7 @@ void  divideNetworkIntoModularityGroups(LinkedList *P, LinkedList *O, spmat * ad
 
 void writeToOutputFile(char* filename, LinkedList *O) {
 	FILE* outputFile;
-	int k, size, i, j;
+	int k, size;
 	Node* currNode;
 
 	outputFile = fopen(filename, "w");
@@ -306,18 +276,9 @@ void writeToOutputFile(char* filename, LinkedList *O) {
 		exit(4);/*replace withh error*/
 	}
 
-	printf("output:\n");
-	printf("num of groups: %d\n", *(O->len));
-
 	currNode = O->head;
-	i = 1;
-
 	do {
-		printf("group num %d:\n", i);
-		i++;
-
 		size = currNode->lenOfNodes;
-		printf("size of group=%d " , size);
 		k = fwrite(&size, sizeof(int), 1, outputFile);
 		if (k != 1) {
 			exit(4);/*replace withh error*/
@@ -327,11 +288,6 @@ void writeToOutputFile(char* filename, LinkedList *O) {
 		if (k != size) {
 			exit(4);/*replace withh error*/
 		}
-
-		for (j = 0; j < size; j++) {
-			printf(" %d ", *(currNode->nodes + j));
-		}
-		printf("\n");
 
 		currNode = currNode->next;
 
