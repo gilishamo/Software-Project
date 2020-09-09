@@ -4,6 +4,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include "spmat.h"
+#include "util.h"
 
 void add_arr(struct _spmat*, const double*, int);
 void free_arr(struct _spmat*);
@@ -16,26 +17,11 @@ spmat* spmat_allocate_array(int n, int nnz) {
 	int* col, * row, * index;
 	void** arrays;
 
-	arrays = malloc(4 * sizeof(void*));
-	if (arrays == NULL) {
-		exit(2); /*replace with error*/
-	}
-	val = (double*)malloc(nnz * sizeof(double));
-	if (val == NULL) {
-		exit(2); /*replace with error*/
-	}
-	col = (int*)malloc(nnz * sizeof(int));
-	if (col == NULL) {
-		exit(2); /*replace with error*/
-	}
-	row = (int*)malloc((n + 1) * sizeof(int));
-	if (row == NULL) {
-		exit(2); /*replace with error*/
-	}
-	index = (int*)malloc(sizeof(int));
-	if (index == NULL) {
-		exit(2); /*replace with error*/
-	}
+	arrays = allocate_memory(4, sizeof(void*));
+	val = (double*)allocate_memory(nnz, sizeof(double));
+	col = (int*)allocate_memory(nnz, sizeof(int));
+	row = (int*)allocate_memory(n+1, sizeof(int));
+	index = (int*)allocate_memory(1, sizeof(int));
 
 	*(index) = 0;
 
@@ -44,10 +30,7 @@ spmat* spmat_allocate_array(int n, int nnz) {
 	*(arrays + 2) = row;
 	*(arrays + 3) = index;
 
-	spmatArray = (spmat*)malloc(sizeof(spmat));
-	if (spmatArray == NULL) {
-		exit(2); /*replace with error*/
-	}
+	spmatArray = (spmat*)allocate_memory(1, sizeof(spmat));
 
 	spmatArray->add_row = &add_arr;
 	spmatArray->free = &free_arr;
@@ -116,13 +99,13 @@ void mult_arr(const struct _spmat* A, const double* v, double* result, int* node
 			while (k < len && *(col + i) > nodes[k]) {
 				k += 1;
 			}
-			if (nodes[k] == *(col + i))
+			if (*(nodes + k) == *(col + i))
 			{
 				sum = sum + (*(val + i)) * (*(v + k));
 				k += 1;
 			}
 		}
-		*(result + j) = sum;
+		*(result + j) = sum; 
 	}
 }
 
@@ -134,25 +117,22 @@ void readMatrixFileToSpmat(spmat* spmat, char* fileName) {
 
 	file = fopen(fileName, "r");
 	if (file == NULL) {
-		exit(3); /*replace with error*/
+		traceAndExit(3, "failed to open file");
 	}
 
 	for (i = 0; i < 2; i++) {
 		k = fread(&n, sizeof(int), 1, file);
 		if (k != 1) {
-			exit(4); /*replace with error*/
+			traceAndExit(4, "failed to read file");
 		}
 	}
 
-	row = (double*)malloc(n * sizeof(double));
-	if (row == NULL) {
-		exit(2); /*replace with error*/
-	}
+	row = (double*)allocate_memory(n, sizeof(double));
 
 	for (i = 0; i < n; i++) {
 		k = fread(row, sizeof(double), n, file);
 		if (k != n) {
-			exit(4); /*replace with error*/
+			traceAndExit(4, "failed to read file");
 		}
 		(*(spmat->add_row))(spmat, row, i);
 	}
@@ -170,7 +150,7 @@ double getValArray(struct _spmat* mat, int i, int j) {
 	int* rowArray = (int*)*(arrays + 2);
 
 	if(i >= n || j >= n) {
-		exit(5);
+		traceAndExit(5, "invalid access to memory ");
 	}
 
 	for (index = *(rowArray + i); index < *(rowArray + i + 1); index++) {

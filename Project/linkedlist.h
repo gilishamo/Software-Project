@@ -2,7 +2,7 @@
 #define _LINKEDLIST_H
 
 typedef struct _Node {
-    int* nodes;
+    int* nodes; /*list of indexes of nodes in sub mat in ascending order*/
     int lenOfNodes;
     struct _Node* next; /*points to next group*/
     struct _Node* prev;
@@ -27,9 +27,9 @@ typedef struct _LinkedList {
 
 } LinkedList;
 
-/*Creates an empty linked list if val == NULL and n = 0.
- * or a linked list with one node s.t node->nodes = val & node->lenOfNodes = n*/
-LinkedList* allocate_LinkedList(int* val, int n);
+/*Creates an empty linked list if val == NULL and len = 0.
+ * or a linked list with one node s.t node->nodes = val & node->lenOfNodes = len*/
+LinkedList* allocate_LinkedList(int* val, int len);
 
 Node* allocate_Node(int* val, int lenOfNodes, Node* next, Node* prev);
 

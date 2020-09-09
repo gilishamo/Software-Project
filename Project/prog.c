@@ -4,6 +4,8 @@
 #include "submat.h"
 #include "linkedlist.h"
 #include "division.h"
+#include "util.h"
+#include <time.h>
 
 void readInputToAdjMatrixFile(char*, char*, int*, int*);
 void setToZero(double*, int);
@@ -18,35 +20,36 @@ int main(int argc, char* argv[]) {
 	spmat* adjMatrix;
 	double* expNumOfEdg;
 	LinkedList* P, * O;
+	time_t start, end;
+	double time;
+
+	start = clock();
 
 	if (argc != 3) {
-		exit(1);/*replace with error*/
+		if (argc < 3) {
+			traceAndExit(1, "too few arguments passed to main");
+		}
+		else {
+			traceAndExit(1, "too many arguments passed to main");
+		}
 	}
 
 	inputFile = fopen(argv[1], "r");
 	if (inputFile == NULL) {
-		exit(3);/*replace with error*/
+		traceAndExit(3, "failed to open file");
 	}
 
 	k = fread(&numOfNodes, sizeof(int), 1, inputFile);
 	if (k != 1) {
-		exit(4);/*replace with error*/
+		traceAndExit(4, "failed to read from file");
 	}
 
 	fclose(inputFile);
 
-	degree = (int*)malloc(numOfNodes * sizeof(int));
-	if (degree == NULL){
-		exit(2);/*replace with error*/
-	}
-	expNumOfEdg = (double*)malloc(numOfNodes * numOfNodes * sizeof(double));
-	if (expNumOfEdg == NULL){
-		exit(2);/*replace with error*/
-	}
-	nodes = (int*)malloc(numOfNodes * sizeof(int));
-	if (nodes == NULL){
-		exit(2);/*replace with error*/
-	}
+	degree = (int*)allocate_memory(numOfNodes, sizeof(int));
+	expNumOfEdg = (double*)allocate_memory(numOfNodes * numOfNodes, sizeof(double));
+	nodes = (int*)allocate_memory(numOfNodes, sizeof(int));
+	
 
 	readInputToAdjMatrixFile(argv[1], "adj_matrix", degree, &nnz);
 
@@ -83,6 +86,12 @@ int main(int argc, char* argv[]) {
 	(*P->free)(P);
 	(*O->free)(O);
 
+	end = clock();
+
+	time = (double)(end - start) / (CLOCKS_PER_SEC);
+
+	printf("my program took %f sec\n" ,time);
+
 	return 0;
 	
 }
@@ -94,50 +103,45 @@ void readInputToAdjMatrixFile(char* input, char* output, int *degree, int *nnz) 
 
 	inputFile = fopen(input, "r");
 	if (inputFile == NULL){
-		exit(3);/*replace with error*/
+		traceAndExit(3, "failed to open file");
 	}
 	adjMatrixFile = fopen(output, "w");
 	if (adjMatrixFile == NULL){
-		exit(3);/*replace with error*/
+		traceAndExit(3, "failed to open file");
 	}
 
 	k = fread(&n, sizeof(int), 1, inputFile);
 	if (k != 1) {
-		exit(4);/*replace with error*/
+		traceAndExit(4, "failed to read file");
 	}
 
 	for (i = 0; i < 2; i++) {
 		k = fwrite(&n, sizeof(int), 1, adjMatrixFile);
 		if (k != 1) {
-			exit(4);/*replace with error*/
+			traceAndExit(4, "failed to write to file");
 		}
 	}
 
-	row = (double*)malloc(n * sizeof(double));
-	if (row == NULL){
-		exit(2);/*replace with error*/
-	}
-	neighbors = (int*)malloc(n * sizeof(int));
-	if (neighbors == NULL){
-		exit(2);/*replace with error*/
-	}
+	row = (double*)allocate_memory(n, sizeof(double));
+	neighbors = (int*)allocate_memory(n, sizeof(int));
+	
 
 	for (i = 0; i < n; i++) {
 		setToZero(row, n);
 		k = fread(&currDegree, sizeof(int), 1, inputFile);
 		if (k != 1) {
-			exit(4);/*replace with error*/
+			traceAndExit(4, "failed to read file");
 		}
 
 		*(degree + i) = currDegree;
 
 		*nnz += currDegree;
 		if (currDegree >= n) {
-			exit(6);/*replace with error*/
+			traceAndExit(6, "invalid input");
 		}
 		k = fread(neighbors, sizeof(int), currDegree, inputFile);
 		if (k != currDegree) {
-			exit(4);/*replace with error*/
+			traceAndExit(4, "failed to read file");
 		}
 		
 		for (j = 0; j < currDegree; j++) {
@@ -146,7 +150,7 @@ void readInputToAdjMatrixFile(char* input, char* output, int *degree, int *nnz) 
 
 		k = fwrite(row, sizeof(double), n, adjMatrixFile);
 		if (k != n) {
-			exit(4);/*replace with error*/
+			traceAndExit(4, "failed to write to file");
 		}
 	}
 	
@@ -179,13 +183,13 @@ void createExpMat(double* expNumOfEdg, int* degree, int numOfNodes, int sumOfDeg
 }
 
 void  divideNetworkIntoModularityGroups(LinkedList *P, LinkedList *O, spmat * adjMatrix, double* expNumOfEdg, int numOfNodes){
-	submat* modulMat;
-	int i, n, s1 = 0, s2 = 0;;
-	double* division;
-	Node* g;
 
 	while (*(P->len)) {
-	
+		int i, n, s1 = 0, s2 = 0;
+		submat* modulMat;
+		double* division;
+		Node* g;
+
 		g = P->tail;
 
 		n = g->lenOfNodes;
@@ -206,10 +210,7 @@ void  divideNetworkIntoModularityGroups(LinkedList *P, LinkedList *O, spmat * ad
 		if (s1 == 0 || s2 == 0) {
 			int* nodes;
 
-			nodes = (int*)malloc(n * sizeof(int));
-			if (nodes == NULL) {
-				exit(2);/*replace with error*/
-			}
+			nodes = (int*)allocate_memory(n, sizeof(int));
 
 			for (i = 0; i < n; i++) {
 				*(nodes + i) = *(g->nodes + i);
@@ -219,15 +220,8 @@ void  divideNetworkIntoModularityGroups(LinkedList *P, LinkedList *O, spmat * ad
 
 		else {
 			int* g1, * g2, index1 = 0, index2 = 0;
-			g1 = (int*)malloc(s1 * sizeof(int));
-			if (g1 == NULL) {
-				exit(2);/*replace with error*/
-			}
-			g2 = (int*)malloc(s2 * sizeof(int));
-			if (g2 == NULL) {
-				exit(2);/*replace with error*/
-			}
-
+			g1 = (int*)allocate_memory(s1, sizeof(int));
+			g2 = (int*)allocate_memory(s2, sizeof(int));
 
 			for (i = 0; i < n; i++) {
 				if (*(division + i) == 1.0) {
@@ -268,12 +262,12 @@ void writeToOutputFile(char* filename, LinkedList *O) {
 
 	outputFile = fopen(filename, "w");
 	if (outputFile == NULL) {
-		exit(3);
+		traceAndExit(3, "failed to open file");
 	}
 
 	k = fwrite(O->len, sizeof(int), 1, outputFile);
 	if (k != 1) {
-		exit(4);/*replace withh error*/
+		traceAndExit(4, "failed to write to file");
 	}
 
 	currNode = O->head;
@@ -281,12 +275,12 @@ void writeToOutputFile(char* filename, LinkedList *O) {
 		size = currNode->lenOfNodes;
 		k = fwrite(&size, sizeof(int), 1, outputFile);
 		if (k != 1) {
-			exit(4);/*replace withh error*/
+			traceAndExit(4, "failed to write to file");
 		}
 
 		k = fwrite(currNode->nodes, sizeof(int), size, outputFile);
 		if (k != size) {
-			exit(4);/*replace withh error*/
+			traceAndExit(4, "failed to write to file");
 		}
 
 		currNode = currNode->next;

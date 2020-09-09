@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include "util.h"
 #include "linkedlist.h"
 
 void insertLastLL(struct _LinkedList*, int*, int);
@@ -9,15 +10,10 @@ void deleteTailLL(struct _LinkedList*);
 void freeLinkedList(struct _LinkedList*);
 void freeNode(struct _Node* node);
 
-typedef DATA;
-
 Node* allocate_Node(int* nodes, int lenOfNodes, Node* next, Node* prev) {
 	Node* newNode;
 
-	newNode = (Node*)malloc(sizeof(Node));
-	if (newNode == NULL) {
-		exit(2);/*replace withh error*/
-	}
+	newNode = (Node*)allocate_memory(1, sizeof(Node));
 
 	newNode->nodes = nodes;
 	newNode->lenOfNodes = lenOfNodes;
@@ -34,18 +30,13 @@ void freeNode(struct _Node* node) {
 	free(node);
 }
 
-LinkedList* allocate_LinkedList(int* val, int n) {
+LinkedList* allocate_LinkedList(int* val, int len) {
 	LinkedList* list;
 	int *listLen;
 
-	list = (LinkedList*)malloc(sizeof(LinkedList));
-	if (list == NULL) {
-		exit(2);/*replace withh error*/
-	}
-	listLen = (int*)malloc(sizeof(int));
-	if (listLen == NULL) {
-		exit(2);/*replace withh error*/
-	}
+	list = (LinkedList*)allocate_memory(1, sizeof(LinkedList));
+	listLen = (int*)allocate_memory(1, sizeof(int));
+
 	*listLen = 0;
 
 	list->head = NULL;
@@ -59,7 +50,7 @@ LinkedList* allocate_LinkedList(int* val, int n) {
 	list->deleteTail = &deleteTailLL;
 
 	if (val != NULL) {
-		(*list->insertLast)(list, val, n);
+		(*list->insertLast)(list, val, len);
 	}
 
 	return list;

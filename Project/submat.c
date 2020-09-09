@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "submat.h"
 #include "spmat.h"
+#include "util.h"
 
 double* calculateF(spmat*, double*, int*, int, int);
 double getValSubmat(struct _submat*, int, int);
@@ -11,11 +12,8 @@ void multSubMat(struct _submat*, const double*, double*);
 submat* submat_allocate(spmat* adjMat, double* expMat, int* nodes, int n, int numOfNodes) {
 	submat* mat;
 
-	mat = (submat*)malloc(sizeof(submat));
-	if (mat == NULL) {
-		exit(2);/*replace withh error*/
-	}
-
+	mat = (submat*)allocate_memory(1, sizeof(submat));
+		
 	mat->free = &freeSubmat;
 	mat->mult = &multSubMat;
 	mat->getVal = &getValSubmat;
@@ -31,16 +29,16 @@ submat* submat_allocate(spmat* adjMat, double* expMat, int* nodes, int n, int nu
 }
 
 double getValSubmat(struct _submat* mat, int i, int j) {
-	int numOfNodes = mat->numOfNodes;
+	int numOfNodes = mat->numOfNodes, *nodes=mat->nodes;
 	double *expMat, *f = mat->f, result = 0;
 	spmat* adjMat;
 
 	expMat = mat->expMat;
 	adjMat = mat->adjMat;
 
-	result += (*(adjMat->getVal))(adjMat, i, j);
+	result += (*(adjMat->getVal))(adjMat, nodes[i], nodes[j]);
 
-	result -= *(expMat + i * numOfNodes + j);
+	result -= *(expMat + nodes[i] * numOfNodes + nodes[j]);
 
 	if (i == j) {
 		result -= *(f + i);
@@ -71,7 +69,6 @@ void multSubMat(struct _submat* mat, const double* vector, double* result) {
 	/*Calculating expMat * vector and subtracting the product from result*/
 	for (i = 0; i < n; i++) {
 		sum = 0;
-
 		for (j = 0; j < n; j++) {
 			sum += *(expMat + nodes[i] * numOfNodes + nodes[j]) * *(vector + j);
 			if (i == j) {
@@ -87,10 +84,7 @@ double* calculateF(spmat *adjMat, double *expMat, int* nodes, int sizeOfSub, int
 	int i, j;
 	double *f;
 
-	f = (double*)malloc(sizeOfSub * sizeof(double));
-	if (f == NULL) {
-		exit(2);/*replace with error*/
-	}
+	f = (double*)allocate_memory(sizeOfSub, sizeof(double));
 
 	for (i = 0; i < sizeOfSub; i++) {
 		*(f + i) = 0;

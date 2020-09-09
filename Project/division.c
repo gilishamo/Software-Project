@@ -1,41 +1,27 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include "util.h"
 #include "submat.h"
 #include "powerIteration.h"
 
-void setToTrivialDivision(double*, int);
+void setAllValues(double*,int, double);
 void computeDivision(double*, double*, int);
 
 double* divideIntoTwo(submat *modulMat) {
 	double* eigenVector, * eigenValue, *tempVector, temp, * division;
 	int n = modulMat->sizeOfSub;
 
-	eigenVector = (double*)malloc(n * sizeof(double));
-	if (eigenVector == NULL){
-		exit(2);/*replace with error*/
-	}
-	eigenValue = (double*)malloc(sizeof(double));
-	if (eigenValue == NULL){
-		exit(2);/*replace with error*/
-	}
-	division = (double*)malloc(n * sizeof(double));
-	if (division == NULL){
-		exit(2);/*replace with error*/
-	}
-	tempVector = (double*)malloc(n * sizeof(double));
-	if (tempVector == NULL){
-		exit(2);/*replace with error*/
-	}
-
-	setToTrivialDivision(division, n);
+	eigenVector = (double*)allocate_memory(n, sizeof(double));
+	eigenValue = (double*)allocate_memory(1, sizeof(double));
+	division = (double*)allocate_memory(n, sizeof(double));
+	tempVector = (double*)allocate_memory(n, sizeof(double));
+	
+	setAllValues(division, n, 1.0);
 
 	powerIterationWithMatrixShifting(modulMat, eigenVector, eigenValue);
 
 	if (*eigenValue <= 0) {
-		free(eigenValue);
-		free(eigenVector);
-		free(tempVector);
-		return division;
+		goto end;
 	}
 
 	computeDivision(eigenVector, division, n);
@@ -44,15 +30,11 @@ double* divideIntoTwo(submat *modulMat) {
 	temp = dotProduct(division, tempVector, n);
 
 	if (temp <= 0) {
-		setToTrivialDivision(division, n);
-
-		free(eigenValue);
-		free(eigenVector);
-		free(tempVector);
-
-		return division;
+		setAllValues(division, n, 1.0);
+		goto end;
 	}
 
+	end:
 	free(eigenValue);
 	free(eigenVector);
 	free(tempVector);
@@ -60,11 +42,11 @@ double* divideIntoTwo(submat *modulMat) {
 	return division;
 }
 
-void setToTrivialDivision(double* division, int n) {
+void setAllValues(double* division, int len, double val){
 	int i;
 
-	for (i = 0; i < n; i++) {
-		*(division + i) = 1.0;
+	for (i = 0; i < len; i++) {
+		*(division + i) = val;
 	}
 }
 

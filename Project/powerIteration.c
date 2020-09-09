@@ -16,10 +16,7 @@ void powerIterationWithMatrixShifting(submat *modulMatrix, double* eigenVector, 
 	double magn, norm;
 	double* tempVector;
 	
-	tempVector = (double*)malloc(n * sizeof(double));
-	if (tempVector == NULL) {
-		exit(2);/*replace withh error*/
-	}
+	tempVector = (double*)allocate_memory(n, sizeof(double));
 
 	norm = norm1(modulMatrix);
 
@@ -102,12 +99,12 @@ double dotProduct(double* row, double *col,  int len)
 
 double norm1(submat *modulMat) {
 	double sum, max = 0;
-	int i, j, n = modulMat->sizeOfSub, *nodes = modulMat->nodes;
+	int i, j, n = modulMat->sizeOfSub;
 
 	for (i = 0; i < n; i++) {
 		sum = 0;
 		for (j = 0; j < n; j++) {
-			sum += fabs((*(modulMat->getVal))(modulMat, nodes[j], nodes[i]));
+			sum += fabs((*(modulMat->getVal))(modulMat, j, i));
 		}
 		if (sum > max) {
 			max = sum;
