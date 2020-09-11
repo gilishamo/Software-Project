@@ -7,8 +7,8 @@
 void setAllValues(double*,int, double);
 void computeDivision(double*, double*, int);
 
-double* divideIntoTwo(submat *modulMat) {
-	double* eigenVector, * eigenValue, *tempVector, temp, * division;
+double* divideIntoTwo(submat *modulMat, double * eigenValue) {
+	double* eigenVector, *tempVector, temp, * division;
 	int n = modulMat->sizeOfSub;
 
 	eigenVector = (double*)allocate_memory(n, sizeof(double));

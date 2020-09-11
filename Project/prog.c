@@ -6,6 +6,7 @@
 #include "division.h"
 #include "util.h"
 #include <time.h>
+#include "modmax.h"
 
 void readInputToAdjMatrixFile(char*, char*, int*, int*);
 void setToZero(double*, int);
@@ -183,11 +184,10 @@ void createExpMat(double* expNumOfEdg, int* degree, int numOfNodes, int sumOfDeg
 }
 
 void  divideNetworkIntoModularityGroups(LinkedList *P, LinkedList *O, spmat * adjMatrix, double* expNumOfEdg, int numOfNodes){
-
 	while (*(P->len)) {
 		int i, n, s1 = 0, s2 = 0;
 		submat* modulMat;
-		double* division;
+		double* division, *eigenVale;
 		Node* g;
 
 		g = P->tail;
@@ -196,7 +196,13 @@ void  divideNetworkIntoModularityGroups(LinkedList *P, LinkedList *O, spmat * ad
 
 		modulMat = submat_allocate(adjMatrix, expNumOfEdg, g->nodes, n, numOfNodes);
 
-		division = divideIntoTwo(modulMat);
+		eigenVale = (double*)allocate_memory(1, sizeof(double));
+
+		division = divideIntoTwo(modulMat, eigenVale);
+
+		if (*eigenVale) {
+			modularityMaximization(division, n, modulMat);
+		}
 
 		for (i = 0; i < n; i++) {
 			if (*(division + i) == 1.0) {
@@ -257,7 +263,7 @@ void  divideNetworkIntoModularityGroups(LinkedList *P, LinkedList *O, spmat * ad
 
 void writeToOutputFile(char* filename, LinkedList *O) {
 	FILE* outputFile;
-	int k, size;
+	int k, size, i = 1;
 	Node* currNode;
 
 	outputFile = fopen(filename, "w");
@@ -270,6 +276,8 @@ void writeToOutputFile(char* filename, LinkedList *O) {
 		traceAndExit(4, "failed to write to file");
 	}
 
+	printf("num of clusters= %d\n", *O->len);
+
 	currNode = O->head;
 	do {
 		size = currNode->lenOfNodes;
@@ -278,11 +286,18 @@ void writeToOutputFile(char* filename, LinkedList *O) {
 			traceAndExit(4, "failed to write to file");
 		}
 
+		printf("size of group %d is %d ", i, size);
+		i++;
+
 		k = fwrite(currNode->nodes, sizeof(int), size, outputFile);
 		if (k != size) {
 			traceAndExit(4, "failed to write to file");
 		}
-
+		printf("vertices are: ");
+		for (k = 0; k < size; k++) {
+			printf("%d ", currNode->nodes[k]);
+		}
+		printf("\n");
 		currNode = currNode->next;
 
 	} while (currNode != O->head);

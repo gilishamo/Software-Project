@@ -5,6 +5,7 @@
 #include<math.h>
 #include "spmat.h"
 #include "submat.h"
+#include "util.h"
 
 void createRandomVector(double*, int);
 int calcDiff(double*, double*, int);
