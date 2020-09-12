@@ -75,10 +75,9 @@ void createRandomVector(double* vector, int n)
 int calcDiff(double* vector, double* newVector, int n)
 {
 	int i;
-	double epsilon = 0.00001;
 	for (i = 0; i < n; i++)
 	{
-		if (fabs(newVector[i] - vector[i]) >= epsilon)
+		if (fabs(newVector[i] - vector[i]) >= EPSILON)
 		{
 			return 0;
 		}

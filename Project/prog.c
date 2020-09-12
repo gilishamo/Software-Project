@@ -200,7 +200,7 @@ void  divideNetworkIntoModularityGroups(LinkedList *P, LinkedList *O, spmat * ad
 
 		division = divideIntoTwo(modulMat, eigenVale);
 
-		if (*eigenVale) {
+		if (*eigenVale != EPSILON) {
 			modularityMaximization(division, n, modulMat);
 		}
 

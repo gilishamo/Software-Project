@@ -2,6 +2,8 @@
 
 /*Utilities functions*/
 
+#define EPSILON 0.00001
+
 /*Prints error message and exits with errorNumber */
 void traceAndExit(int errorNum, char* message);
 
