@@ -156,6 +156,10 @@ double getValArray(struct _spmat* mat, int i, int j) {
 		if (*(col + index) == j) {
 			return *(val + index);
 		}
+
+		if (*(col + index) > j) {
+			return 0.0;
+		}
 	}
 
 	return 0.0;

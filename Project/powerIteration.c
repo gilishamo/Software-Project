@@ -34,7 +34,7 @@ void powerIterationWithMatrixShifting(submat *modulMatrix, double* eigenVector, 
 
 		magn = sqrt(dotProduct(eigenVector, eigenVector, n));
 		if (magn == 0) {
-			exit(7);
+			traceAndExit(7, "division in zero");
 		}
 		for (i = 0; i < n; i++) {
 			*(eigenVector + i) /= magn;
@@ -75,10 +75,9 @@ void createRandomVector(double* vector, int n)
 int calcDiff(double* vector, double* newVector, int n)
 {
 	int i;
-	double epsilon = 0.00001;
 	for (i = 0; i < n; i++)
 	{
-		if (fabs(newVector[i] - vector[i]) >= epsilon)
+		if (fabs(newVector[i] - vector[i]) >= EPSILON)
 		{
 			return 0;
 		}

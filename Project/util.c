@@ -19,3 +19,10 @@ void* allocate_memory(int len, size_t size) {
 	return pointer;
 }
 
+void setAllValues(double* vector, int len, double val) {
+	int i;
+
+	for (i = 0; i < len; i++) {
+		*(vector + i) = val;
+	}
+}

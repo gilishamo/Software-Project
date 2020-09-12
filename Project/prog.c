@@ -7,19 +7,18 @@
 #include "util.h"
 #include <time.h>
 #include "modmax.h"
+#include "expmat.h"
 
-void readInputToAdjMatrixFile(char*, char*, int*, int*);
-void setToZero(double*, int);
-void createExpMat(double*, int*, int, int);
-void  divideNetworkIntoModularityGroups(LinkedList*, LinkedList*, spmat*, double*, int);
+void readInputToAdjMatrixFile(char*, char*, expmat*, int*);
+void  divideNetworkIntoModularityGroups(LinkedList*, LinkedList*, spmat*, expmat*, int);
 void writeToOutputFile(char*, LinkedList*);
 
 
 int main(int argc, char* argv[]) {
 	FILE* inputFile;
-	int k, i, numOfNodes, nnz = 0, sumOfDegrees = 0, * degree, * nodes;
+	int k, i, numOfVertices, nnz = 0, * vertices;
 	spmat* adjMatrix;
-	double* expNumOfEdg;
+	expmat* expNumOfEdgMat;
 	LinkedList* P, * O;
 	time_t start, end;
 	double time;
@@ -40,48 +39,38 @@ int main(int argc, char* argv[]) {
 		traceAndExit(3, "failed to open file");
 	}
 
-	k = fread(&numOfNodes, sizeof(int), 1, inputFile);
+	k = fread(&numOfVertices, sizeof(int), 1, inputFile);
 	if (k != 1) {
 		traceAndExit(4, "failed to read from file");
 	}
 
 	fclose(inputFile);
 
-	degree = (int*)allocate_memory(numOfNodes, sizeof(int));
-	expNumOfEdg = (double*)allocate_memory(numOfNodes * numOfNodes, sizeof(double));
-	nodes = (int*)allocate_memory(numOfNodes, sizeof(int));
+	expNumOfEdgMat = (expmat*)allocate_expmat(numOfVertices);
+	vertices = (int*)allocate_memory(numOfVertices, sizeof(int));
 	
+	/*Read input file to AdjMatrixFile and calss (*expNumOfEdgMat->add_degree) numOfVertices times in a row */
+	readInputToAdjMatrixFile(argv[1], "adj_matrix", expNumOfEdgMat, &nnz);
 
-	readInputToAdjMatrixFile(argv[1], "adj_matrix", degree, &nnz);
-
-	adjMatrix = spmat_allocate_array(numOfNodes, nnz);
+	adjMatrix = spmat_allocate_array(numOfVertices, nnz);
 
 	/* Calls add_row n times in order to initialize the values of spmat*/
 	readMatrixFileToSpmat(adjMatrix, "adj_matrix");
 
-	/*Calculates sum of degrees*/
-	for (i = 0; i < numOfNodes; i++) {
-		sumOfDegrees += *(degree + i);
+	/*Initializing first group for division aka {0,1,...,numOfVertices-1} */
+	for (i = 0; i < numOfVertices; i++) {
+		*(vertices + i) = i;
 	}
 
-	/*Calculates the expected number of edges between i and j for i,j= 0,...,n-1 and insert to mat*/
-	createExpMat(expNumOfEdg, degree, numOfNodes, sumOfDegrees);
-
-	for (i = 0; i < numOfNodes; i++) {
-		*(nodes + i) = i;
-	}
-
-	P = allocate_LinkedList(nodes, numOfNodes);
+	P = allocate_LinkedList(vertices, numOfVertices);
 	O = allocate_LinkedList(NULL, 0);
 
-	divideNetworkIntoModularityGroups(P, O, adjMatrix, expNumOfEdg, numOfNodes);
-
+	divideNetworkIntoModularityGroups(P, O, adjMatrix, expNumOfEdgMat, numOfVertices);
 
 	writeToOutputFile(argv[2], O);
 
-	/*free(nodes);*/
-	free(degree);
-	free(expNumOfEdg);
+
+	(*expNumOfEdgMat->free)(expNumOfEdgMat);
 	(*adjMatrix->free)(adjMatrix);
 
 	(*P->free)(P);
@@ -97,7 +86,7 @@ int main(int argc, char* argv[]) {
 	
 }
 
-void readInputToAdjMatrixFile(char* input, char* output, int *degree, int *nnz) {
+void readInputToAdjMatrixFile(char* input, char* output, expmat* expNumOfEdgMat, int *nnz) {
 	int i, j, n, k, currDegree, * neighbors;
 	double* row;
 	FILE* inputFile, * adjMatrixFile;
@@ -128,13 +117,13 @@ void readInputToAdjMatrixFile(char* input, char* output, int *degree, int *nnz) 
 	
 
 	for (i = 0; i < n; i++) {
-		setToZero(row, n);
+		setAllValues(row, n, 0.0);
 		k = fread(&currDegree, sizeof(int), 1, inputFile);
 		if (k != 1) {
 			traceAndExit(4, "failed to read file");
 		}
 
-		*(degree + i) = currDegree;
+		(*expNumOfEdgMat->add_degree)(expNumOfEdgMat, currDegree, i);
 
 		*nnz += currDegree;
 		if (currDegree >= n) {
@@ -163,44 +152,26 @@ void readInputToAdjMatrixFile(char* input, char* output, int *degree, int *nnz) 
 
 }
 
-void setToZero(double* row, int len) {
-	int i;
+void  divideNetworkIntoModularityGroups(LinkedList *P, LinkedList *O, spmat * adjMatrix, expmat* expNumOfEdgMat, int numOfVertices){
+	int i, n, s1, s2;
+	double* division, * eigenVale;
+	submat* modulMat;
+	Node* g;
 
-	for (i = 0; i < len; i++) {
-		row[i] = 0.0;
-	}
-}
-
-void createExpMat(double* expNumOfEdg, int* degree, int numOfNodes, int sumOfDegrees) {
-	int i, j;
-	double temp;
-
-	for (i = 0; i < numOfNodes; i++) {
-		temp = (double)(*(degree + i)) / (double)(sumOfDegrees);
-		for (j = 0; j < numOfNodes; j++) {
-			*(expNumOfEdg + i * numOfNodes + j) = (double)(*(degree + j)) * temp;
-		}
-	}
-}
-
-void  divideNetworkIntoModularityGroups(LinkedList *P, LinkedList *O, spmat * adjMatrix, double* expNumOfEdg, int numOfNodes){
 	while (*(P->len)) {
-		int i, n, s1 = 0, s2 = 0;
-		submat* modulMat;
-		double* division, *eigenVale;
-		Node* g;
+		s1 = 0, s2 = 0;
 
 		g = P->tail;
 
-		n = g->lenOfNodes;
+		n = g->lenOfVertices;
 
-		modulMat = submat_allocate(adjMatrix, expNumOfEdg, g->nodes, n, numOfNodes);
+		modulMat = submat_allocate(adjMatrix, expNumOfEdgMat, g->vertices, n, numOfVertices);
 
 		eigenVale = (double*)allocate_memory(1, sizeof(double));
 
 		division = divideIntoTwo(modulMat, eigenVale);
 
-		if (*eigenVale) {
+		if (*eigenVale != EPSILON || *eigenVale != 0) {
 			modularityMaximization(division, n, modulMat);
 		}
 
@@ -214,14 +185,14 @@ void  divideNetworkIntoModularityGroups(LinkedList *P, LinkedList *O, spmat * ad
 		}
 
 		if (s1 == 0 || s2 == 0) {
-			int* nodes;
+			int* vertices;
 
-			nodes = (int*)allocate_memory(n, sizeof(int));
+			vertices = (int*)allocate_memory(n, sizeof(int));
 
 			for (i = 0; i < n; i++) {
-				*(nodes + i) = *(g->nodes + i);
+				*(vertices + i) = *(g->vertices + i);
 			}
-			(*O->insertLast)(O, nodes, n);
+			(*O->insertLast)(O, vertices, n);
 		}
 
 		else {
@@ -231,11 +202,11 @@ void  divideNetworkIntoModularityGroups(LinkedList *P, LinkedList *O, spmat * ad
 
 			for (i = 0; i < n; i++) {
 				if (*(division + i) == 1.0) {
-					*(g1 + index1) = *((g->nodes) + i);
+					*(g1 + index1) = *((g->vertices) + i);
 					index1++;
 				}
 				else {
-					*(g2 + index2) = *((g->nodes) + i);
+					*(g2 + index2) = *((g->vertices) + i);
 					index2++;
 				}
 			}
@@ -280,7 +251,7 @@ void writeToOutputFile(char* filename, LinkedList *O) {
 
 	currNode = O->head;
 	do {
-		size = currNode->lenOfNodes;
+		size = currNode->lenOfVertices;
 		k = fwrite(&size, sizeof(int), 1, outputFile);
 		if (k != 1) {
 			traceAndExit(4, "failed to write to file");
@@ -289,13 +260,13 @@ void writeToOutputFile(char* filename, LinkedList *O) {
 		printf("size of group %d is %d ", i, size);
 		i++;
 
-		k = fwrite(currNode->nodes, sizeof(int), size, outputFile);
+		k = fwrite(currNode->vertices, sizeof(int), size, outputFile);
 		if (k != size) {
 			traceAndExit(4, "failed to write to file");
 		}
 		printf("vertices are: ");
 		for (k = 0; k < size; k++) {
-			printf("%d ", currNode->nodes[k]);
+			printf("%d ", currNode->vertices[k]);
 		}
 		printf("\n");
 		currNode = currNode->next;

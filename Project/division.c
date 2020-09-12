@@ -4,7 +4,6 @@
 #include "submat.h"
 #include "powerIteration.h"
 
-void setAllValues(double*,int, double);
 void computeDivision(double*, double*, int);
 
 double* divideIntoTwo(submat *modulMat, double * eigenValue) {
@@ -40,14 +39,6 @@ double* divideIntoTwo(submat *modulMat, double * eigenValue) {
 	free(tempVector);
 
 	return division;
-}
-
-void setAllValues(double* division, int len, double val){
-	int i;
-
-	for (i = 0; i < len; i++) {
-		*(division + i) = val;
-	}
 }
 
 void computeDivision(double* eigenVector, double* division, int n) {

@@ -1,10 +1,9 @@
 #include <stdlib.h>
-#include "arraylist.h"
 #include "submat.h"
 #include "modmax.h"
 #include "util.h"
 
-#define EPSILON 0.00001
+
 
 int calcScore(double*, double*, int*, int, submat*);
 
@@ -70,10 +69,10 @@ void modularityMaximization(double* division, int n, submat* modulMat) {
 
 /* calculates (and updates) the vector score for every k in unmoved */
 int calcScore (double* score, double* division, int* unmoved, int n, submat* modulMat) {
-    int j, numOfNodes = modulMat->numOfNodes, k, maxIndex, first = 1; /* k is the node's number in unmoved*/
+    int j, k, maxIndex, first = 1, * vertices = modulMat->vertices; /* k is the node's number in unmoved*/
     double valA, valD, sum, value, max; /* the value of score[k] */
     spmat* A = modulMat->adjMat;
-    double* D = modulMat->expMat;
+    expmat* D = modulMat->expMat;
 
     for (k = 0; k < n; k++) {
         /* if unmoved[k] == -1 than k isn't in unmoved */
@@ -82,11 +81,11 @@ int calcScore (double* score, double* division, int* unmoved, int n, submat* mod
             /* calculation of value: */
             sum = 0;
             for (j = 0; j < n; j++) {
-                valA = (*A->getVal)(A, k, j);
-                valD = *(D + (k * numOfNodes) + j);
+                valA = (*A->getVal)(A, vertices[k], vertices[j]);
+                valD = (*D->getExpNumOfEdges)(D, vertices[k], vertices[j]);
                 sum += ((valA - valD) * division[j]);
             }
-            value = (4 * division[k] * sum) + (4 * *(D + (k * numOfNodes) + k)); /* make sure it's correct */
+            value = (4 * division[k] * sum) + 4 * (*D->getExpNumOfEdges)(D, vertices[k], vertices[k]);
             score[k] = value;
             if (first) {
                 max = value;

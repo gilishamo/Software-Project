@@ -2,14 +2,15 @@
 #include <stdio.h>
 #include "submat.h"
 #include "spmat.h"
+#include "expmat.h"
 #include "util.h"
 
-double* calculateF(spmat*, double*, int*, int, int);
+double* calculateF(spmat*, expmat*, int*, int);
 double getValSubmat(struct _submat*, int, int);
 void freeSubmat(struct _submat*);
 void multSubMat(struct _submat*, const double*, double*);
 
-submat* submat_allocate(spmat* adjMat, double* expMat, int* nodes, int n, int numOfNodes) {
+submat* submat_allocate(spmat* adjMat, expmat* expMat, int* vertices, int n, int numOfVertices) {
 	submat* mat;
 
 	mat = (submat*)allocate_memory(1, sizeof(submat));
@@ -20,25 +21,26 @@ submat* submat_allocate(spmat* adjMat, double* expMat, int* nodes, int n, int nu
 
 	mat->adjMat = adjMat;
 	mat->expMat = expMat;
-	mat->nodes = nodes;
+	mat->vertices = vertices;
 	mat->sizeOfSub = n;
-	mat->numOfNodes = numOfNodes;
-	mat->f = calculateF(adjMat, expMat, nodes, n, numOfNodes);
+	mat->numOfVertices = numOfVertices;
+	mat->f = calculateF(adjMat, expMat, vertices, n);
 
 	return mat;
 }
 
 double getValSubmat(struct _submat* mat, int i, int j) {
-	int numOfNodes = mat->numOfNodes, *nodes=mat->nodes;
-	double *expMat, *f = mat->f, result = 0;
+	int *vertices=mat->vertices;
+	double *f = mat->f, result = 0;
 	spmat* adjMat;
+	expmat* expMat;
 
 	expMat = mat->expMat;
 	adjMat = mat->adjMat;
 
-	result += (*(adjMat->getVal))(adjMat, nodes[i], nodes[j]);
+	result += (*adjMat->getVal)(adjMat, vertices[i], vertices[j]);
 
-	result -= *(expMat + nodes[i] * numOfNodes + nodes[j]);
+	result -= (*expMat->getExpNumOfEdges)(expMat, vertices[i], vertices[j]);
 
 	if (i == j) {
 		result -= *(f + i);
@@ -55,32 +57,29 @@ void freeSubmat(struct _submat* mat) {
 }
 
 void multSubMat(struct _submat* mat, const double* vector, double* result) {
-	int i, j, n = mat->sizeOfSub, * nodes = mat->nodes, numOfNodes = mat->numOfNodes;
-	double sum;
-	double* expMat, *f = mat->f;
+	int i, n = mat->sizeOfSub, * vertices = mat->vertices;
+	double *f = mat->f, *temp;
 	spmat* adjMat;
+	expmat* expMat;
 
 	expMat = mat->expMat;
 	adjMat = mat->adjMat;
 
-	/*Calculating adjMat * vector and storing the product in result*/
-	(*(adjMat->mult))(adjMat, vector, result, nodes, n); 
-	
-	/*Calculating expMat * vector and subtracting the product from result*/
-	for (i = 0; i < n; i++) {
-		sum = 0;
-		for (j = 0; j < n; j++) {
-			sum += *(expMat + nodes[i] * numOfNodes + nodes[j]) * *(vector + j);
-			if (i == j) {
-				sum += *(f + i) * *(vector + j); 
-			}
-		}
+	temp = (double*)allocate_memory(n, sizeof(double));
 
-		*(result + i) -= sum;
+	/*Calculating adjMat * vector and storing the product in result*/
+	(*(adjMat->mult))(adjMat, vector, result, vertices, n); 
+	
+	/* Calculating expMat * vector and storing the product in temp */
+	(*expMat->mult)(expMat, vertices, n, vector, temp);
+
+	for (i = 0; i < n; i++) {
+		*(result + i) -= *(temp + i);
+		*(result + i) -= *(f + i) * *(vector + i);
 	}
 }
 
-double* calculateF(spmat *adjMat, double *expMat, int* nodes, int sizeOfSub, int numOfNodes) {
+double* calculateF(spmat *adjMat, expmat *expMat, int* vertices, int sizeOfSub) {
 	int i, j;
 	double *f;
 
@@ -89,11 +88,9 @@ double* calculateF(spmat *adjMat, double *expMat, int* nodes, int sizeOfSub, int
 	for (i = 0; i < sizeOfSub; i++) {
 		*(f + i) = 0;
 		for (j = 0; j < sizeOfSub; j++) {
-			*(f + i) -= *(expMat + (*(nodes + i)) * numOfNodes + *(nodes + j));
-			*(f + i) +=(*(adjMat->getVal))(adjMat, nodes[i], nodes[j]);
+			*(f + i) -= (*expMat->getExpNumOfEdges)(expMat, vertices[i], vertices[j]);
+			*(f + i) +=(*(adjMat->getVal))(adjMat, vertices[i], vertices[j]);
 		}
 	}
-
-
 	return f;
 }
