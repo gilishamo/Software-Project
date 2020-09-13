@@ -13,9 +13,10 @@ double dotProduct(double*, double*, int);
 double norm1(submat*);
 
 void powerIterationWithMatrixShifting(submat *modulMatrix, double* eigenVector, double* eigenValue) {
-	int i, diff = 0, n = modulMatrix->sizeOfSub;
+	int i, count = 0, diff = 0, n = modulMatrix->sizeOfSub, maxIteration = modulMatrix->numOfVertices * modulMatrix->numOfVertices;
 	double magn, norm;
 	double* tempVector;
+
 	
 	tempVector = (double*)allocate_memory(n, sizeof(double));
 
@@ -33,7 +34,7 @@ void powerIterationWithMatrixShifting(submat *modulMatrix, double* eigenVector, 
 		}
 
 		magn = sqrt(dotProduct(eigenVector, eigenVector, n));
-		if (magn == 0) {
+		if (magn == EPSILON || magn == 0) {
 			traceAndExit(7, "division in zero");
 		}
 		for (i = 0; i < n; i++) {
@@ -44,6 +45,10 @@ void powerIterationWithMatrixShifting(submat *modulMatrix, double* eigenVector, 
 
 		for (i = 0; i < n; i++) {
 			*(tempVector + i) = *(eigenVector + i);
+		}
+		count++;
+		if (count > maxIteration) {
+			traceAndExit(8, "infinite loop");
 		}
 	}
 	
@@ -80,6 +85,10 @@ int calcDiff(double* vector, double* newVector, int n)
 		if (fabs(newVector[i] - vector[i]) >= EPSILON)
 		{
 			return 0;
+		}
+
+		if (newVector[i] == -vector[i]) {
+			traceAndExit(8, "infinite loop");
 		}
 	}
 	return 1;

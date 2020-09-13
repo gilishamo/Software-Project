@@ -52,6 +52,10 @@ int main(int argc, char* argv[]) {
 	/*Read input file to AdjMatrixFile and calss (*expNumOfEdgMat->add_degree) numOfVertices times in a row */
 	readInputToAdjMatrixFile(argv[1], "adj_matrix", expNumOfEdgMat, &nnz);
 
+	if (expNumOfEdgMat->sumOfDegrees == 0) {
+		traceAndExit(7, "division in zero");
+	}
+
 	adjMatrix = spmat_allocate_array(numOfVertices, nnz);
 
 	/* Calls add_row n times in order to initialize the values of spmat*/
