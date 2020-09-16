@@ -14,8 +14,7 @@ double* SingletonNorm1(submat*);
 
 void powerIterationWithMatrixShifting(submat *modulMatrix, double* eigenVector, double* eigenValue) {
 	int i, count = 0, diff = 0, n = modulMatrix->sizeOfSub, maxIteration = modulMatrix->numOfVertices * modulMatrix->numOfVertices + 1000* modulMatrix->numOfVertices;
-	double magn, * tempVector, * norm, product;
-	double *prev;
+	double magn, * tempVector, * norm, product, *prev;
 	
 	tempVector = (double*)allocate_memory(n, sizeof(double));
 	prev = (double*)allocate_memory(n, sizeof(double));
@@ -28,12 +27,9 @@ void powerIterationWithMatrixShifting(submat *modulMatrix, double* eigenVector, 
 	/*power iteration*/
 	while (diff == 0) {
 		(*(modulMatrix->mult))(modulMatrix, tempVector, eigenVector);
-
 		for (i = 0; i < n; i++) {
 			*(eigenVector + i) += *(tempVector + i) * *norm;
 		}
-
-		
 		magn = sqrt(dotProduct(eigenVector, eigenVector, n));
 		if (magn > -EPSILON && magn < EPSILON) {
 			traceAndExit(7, "division in zero");
@@ -48,7 +44,6 @@ void powerIterationWithMatrixShifting(submat *modulMatrix, double* eigenVector, 
 					traceAndExit(8, "infinite loop vectors");
 				}
 			}
-
 			for (i = 0; i < n; i++) {
 				*(prev + i) = *(tempVector + i);
 			}
@@ -66,23 +61,18 @@ void powerIterationWithMatrixShifting(submat *modulMatrix, double* eigenVector, 
 	}
 	
 	/*Computing the eigenValue*/
-
 	(*(modulMatrix->mult))(modulMatrix, eigenVector, tempVector);
-
 	for (i = 0; i < n; i++) {
 		*(tempVector + i) += *(eigenVector + i) * *norm;
 	}
-
 	product = dotProduct(eigenVector, eigenVector, n);
-
 	if (-EPSILON < product && product < EPSILON) {
 		traceAndExit(7, "division in zero");
 	}
-
 	*eigenValue = ((dotProduct(eigenVector, tempVector, n)) / product ) - *norm;
 
 	free(tempVector);
-	/*free(prev);*/
+	free(prev);
 }
 
 void createRandomVector(double* vector, int n)
