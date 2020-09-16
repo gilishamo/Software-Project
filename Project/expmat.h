@@ -26,6 +26,7 @@ typedef struct _expmat {
 	 *  by passing the argument verticesOfSub,  mat is the matrix that describes the expected number 
      * of edges between each vetex i and j of the sub graph */
 	void (*mult)(struct _expmat* mat, int* verticesOfSub, int sizeOfSub, const double* vector, double* result);
+
 }expmat;
 
 /* Allocates a new expmat with matrix of size numOfVertices */
