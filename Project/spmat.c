@@ -95,7 +95,7 @@ void mult_arr(const struct _spmat* A, const double* v, double* result, int* node
 			if (k >= len) {
 				break;
 			}
-			while (k < len && *(col + i) > nodes[k]) {
+			while (k < len - 1 && *(col + i) > nodes[k]) {
 				k += 1;
 			}
 			if (*(nodes + k) == *(col + i))
@@ -164,4 +164,3 @@ double getValArray(struct _spmat* mat, int i, int j) {
 
 	return 0.0;
 }
-

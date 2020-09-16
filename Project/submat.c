@@ -10,7 +10,7 @@ double getValSubmat(struct _submat*, int, int);
 void freeSubmat(struct _submat*);
 void multSubMat(struct _submat*, const double*, double*);
 
-submat* submat_allocate(spmat* adjMat, expmat* expMat, int* vertices, int n, int numOfVertices) {
+submat* submat_allocate(spmat* adjMat, expmat* expMat, int* vertices, int sizeOfSub, int numOfVertices) {
 	submat* mat;
 
 	mat = (submat*)allocate_memory(1, sizeof(submat));
@@ -22,9 +22,9 @@ submat* submat_allocate(spmat* adjMat, expmat* expMat, int* vertices, int n, int
 	mat->adjMat = adjMat;
 	mat->expMat = expMat;
 	mat->vertices = vertices;
-	mat->sizeOfSub = n;
+	mat->sizeOfSub = sizeOfSub;
 	mat->numOfVertices = numOfVertices;
-	mat->f = calculateF(adjMat, expMat, vertices, n);
+	mat->f = calculateF(adjMat, expMat, vertices, sizeOfSub);
 
 	return mat;
 }
@@ -77,6 +77,8 @@ void multSubMat(struct _submat* mat, const double* vector, double* result) {
 		*(result + i) -= *(temp + i);
 		*(result + i) -= *(f + i) * *(vector + i);
 	}
+
+	free(temp);
 }
 
 double* calculateF(spmat *adjMat, expmat *expMat, int* vertices, int sizeOfSub) {

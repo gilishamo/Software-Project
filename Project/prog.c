@@ -10,8 +10,10 @@
 #include "expmat.h"
 
 void readInputToAdjMatrixFile(char*, char*, expmat*, int*);
-void  divideNetworkIntoModularityGroups(LinkedList*, LinkedList*, spmat*, expmat*, int);
+void divideNetworkIntoModularityGroups(LinkedList*, LinkedList*, spmat*, expmat*, int);
 void writeToOutputFile(char*, LinkedList*);
+void calcLenOfEachGroup(double*, int, int*, int*);
+void initializeGropsAccordingToDivision(double*, int*, int, int*, int*);
 
 
 int main(int argc, char* argv[]) {
@@ -73,7 +75,6 @@ int main(int argc, char* argv[]) {
 
 	writeToOutputFile(argv[2], O);
 
-
 	(*expNumOfEdgMat->free)(expNumOfEdgMat);
 	(*adjMatrix->free)(adjMatrix);
 
@@ -87,7 +88,6 @@ int main(int argc, char* argv[]) {
 	printf("my program took %f sec\n" ,time);
 
 	return 0;
-	
 }
 
 void readInputToAdjMatrixFile(char* input, char* output, expmat* expNumOfEdgMat, int *nnz) {
@@ -103,23 +103,18 @@ void readInputToAdjMatrixFile(char* input, char* output, expmat* expNumOfEdgMat,
 	if (adjMatrixFile == NULL){
 		traceAndExit(3, "failed to open file");
 	}
-
 	k = fread(&n, sizeof(int), 1, inputFile);
 	if (k != 1) {
 		traceAndExit(4, "failed to read file");
 	}
-
 	for (i = 0; i < 2; i++) {
 		k = fwrite(&n, sizeof(int), 1, adjMatrixFile);
 		if (k != 1) {
 			traceAndExit(4, "failed to write to file");
 		}
 	}
-
 	row = (double*)allocate_memory(n, sizeof(double));
 	neighbors = (int*)allocate_memory(n, sizeof(int));
-	
-
 	for (i = 0; i < n; i++) {
 		setAllValues(row, n, 0.0);
 		k = fread(&currDegree, sizeof(int), 1, inputFile);
@@ -147,73 +142,49 @@ void readInputToAdjMatrixFile(char* input, char* output, expmat* expNumOfEdgMat,
 			traceAndExit(4, "failed to write to file");
 		}
 	}
-	
 	fclose(inputFile);
 	fclose(adjMatrixFile);
-
 	free(row);
 	free(neighbors);
-
 }
 
 void  divideNetworkIntoModularityGroups(LinkedList *P, LinkedList *O, spmat * adjMatrix, expmat* expNumOfEdgMat, int numOfVertices){
 	int i, n, s1, s2;
-	double* division, * eigenVale;
+	double* division, eigenVale = 0;
 	submat* modulMat;
 	Node* g;
 
 	while (*(P->len)) {
 		s1 = 0, s2 = 0;
-
-		g = P->tail;
-
+		g = P->head;
 		n = g->lenOfVertices;
-
 		modulMat = submat_allocate(adjMatrix, expNumOfEdgMat, g->vertices, n, numOfVertices);
 
-		eigenVale = (double*)allocate_memory(1, sizeof(double));
+		division = divideIntoTwo(modulMat, &eigenVale);
 
-		division = divideIntoTwo(modulMat, eigenVale);
-
-		if (*eigenVale != EPSILON || *eigenVale != 0) {
+		if (eigenVale < -EPSILON || eigenVale > EPSILON) {
 			modularityMaximization(division, n, modulMat);
 		}
 
-		for (i = 0; i < n; i++) {
-			if (*(division + i) == 1.0) {
-				s1++;
-			}
-			else {
-				s2++;
-			}
-		}
-
+		calcLenOfEachGroup(division, n, &s1, &s2);
+		
 		if (s1 == 0 || s2 == 0) {
 			int* vertices;
 
 			vertices = (int*)allocate_memory(n, sizeof(int));
-
 			for (i = 0; i < n; i++) {
 				*(vertices + i) = *(g->vertices + i);
 			}
+
 			(*O->insertLast)(O, vertices, n);
 		}
 
 		else {
-			int* g1, * g2, index1 = 0, index2 = 0;
+			int* g1, * g2;
 			g1 = (int*)allocate_memory(s1, sizeof(int));
 			g2 = (int*)allocate_memory(s2, sizeof(int));
 
-			for (i = 0; i < n; i++) {
-				if (*(division + i) == 1.0) {
-					*(g1 + index1) = *((g->vertices) + i);
-					index1++;
-				}
-				else {
-					*(g2 + index2) = *((g->vertices) + i);
-					index2++;
-				}
-			}
+			initializeGropsAccordingToDivision(division, g->vertices, n, g1, g2);
 
 			if (s1 == 1) {
 				(*O->insertLast)(O, g1, s1);
@@ -251,7 +222,7 @@ void writeToOutputFile(char* filename, LinkedList *O) {
 		traceAndExit(4, "failed to write to file");
 	}
 
-	printf("num of clusters= %d\n", *O->len);
+	/*printf("num of clusters= %d\n", *O->len);*/
 
 	currNode = O->head;
 	do {
@@ -261,23 +232,50 @@ void writeToOutputFile(char* filename, LinkedList *O) {
 			traceAndExit(4, "failed to write to file");
 		}
 
-		printf("size of group %d is %d ", i, size);
+		/*printf("size of group %d is %d ", i, size);*/
 		i++;
 
 		k = fwrite(currNode->vertices, sizeof(int), size, outputFile);
 		if (k != size) {
 			traceAndExit(4, "failed to write to file");
 		}
-		printf("vertices are: ");
+		/*printf("vertices are: ");
 		for (k = 0; k < size; k++) {
 			printf("%d ", currNode->vertices[k]);
 		}
-		printf("\n");
+		printf("\n");*/
 		currNode = currNode->next;
 
 	} while (currNode != O->head);
 
 	fclose(outputFile);
+}
+
+void calcLenOfEachGroup(double* division, int len, int* s1, int* s2) {
+	int i;
+	for (i = 0; i < len; i++) {
+		if (*(division + i) == 1.0) {
+			*s1 += 1;
+		}
+		else {
+			*s2 += 1;
+		}
+	}
+}
+
+void initializeGropsAccordingToDivision(double* division, int* vertices, int len, int* g1, int* g2) {
+	int i, index1 = 0, index2 = 0;
+
+	for (i = 0; i < len; i++) {
+		if (*(division + i) == 1.0) {
+			*(g1 + index1) = *(vertices + i);
+			index1++;
+		}
+		else {
+			*(g2 + index2) = *(vertices + i);
+			index2++;
+		}
+	}
 }
 
 

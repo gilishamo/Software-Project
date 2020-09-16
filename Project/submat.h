@@ -36,6 +36,6 @@ typedef struct _submat {
 }submat;
 
 /*Allocates a new subMat*/
-submat* submat_allocate(spmat* adjMat, expmat *expMat, int* nodes, int n, int numOfVertices);
+submat* submat_allocate(spmat* adjMat, expmat *expMat, int* nodes, int sizeOfSub, int numOfVertices);
 
 #endif 

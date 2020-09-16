@@ -1,9 +1,8 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include "submat.h"
 #include "modmax.h"
 #include "util.h"
-
-
 
 int calcScore(double*, double*, int*, int, submat*);
 
@@ -27,7 +26,7 @@ void modularityMaximization(double* division, int n, submat* modulMat) {
         for (i = 0; i < n; i++) {
             /*computing deltaQ for the move of eachh unmoved vertex i 
              * and storing the result in score[i] */
-            maxScoreIndex = calcScore(score, division, unmoved, n, modulMat); /* i'm not sure if I send division right */
+            maxScoreIndex = calcScore(score, division, unmoved, n, modulMat);
             division[maxScoreIndex] = -division[maxScoreIndex];
             indices[i] = maxScoreIndex;
             if (i == 0) {
@@ -69,7 +68,7 @@ void modularityMaximization(double* division, int n, submat* modulMat) {
 
 /* calculates (and updates) the vector score for every k in unmoved */
 int calcScore (double* score, double* division, int* unmoved, int n, submat* modulMat) {
-    int j, k, maxIndex, first = 1, * vertices = modulMat->vertices; /* k is the node's number in unmoved*/
+    int j, k, maxIndex = -1, * vertices = modulMat->vertices; /* k is the node's number in unmoved*/
     double valA, valD, sum, value, max; /* the value of score[k] */
     spmat* A = modulMat->adjMat;
     expmat* D = modulMat->expMat;
@@ -87,10 +86,9 @@ int calcScore (double* score, double* division, int* unmoved, int n, submat* mod
             }
             value = (4 * division[k] * sum) + 4 * (*D->getExpNumOfEdges)(D, vertices[k], vertices[k]);
             score[k] = value;
-            if (first) {
+            if (maxIndex == -1) {
                 max = value;
                 maxIndex = k;
-                first = 0;
             }
             else if(value > max) {
                 max = value;

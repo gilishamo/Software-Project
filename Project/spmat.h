@@ -15,7 +15,7 @@ typedef struct _spmat {
 	/* Multiplies matrix A by vector v, into result (result is pre-allocated) */
 	void	(*mult)(const struct _spmat* A, const double* v, double* result, int* nodes, int len);
 
-	/* returns the value in row i and column j of the original matrix*/
+	/* Returns the value in row i and column j of the original matrix*/
 	double	(*getVal)(struct _spmat* mat, int i, int j);
 
 	/* Private field for inner implementation.
