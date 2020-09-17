@@ -8,7 +8,7 @@
 void add_arr(struct _spmat*, const double*, int);
 void free_arr(struct _spmat*);
 void mult_arr(const struct _spmat*, const double*, double*, int*, int);
-double multRowInVecSpmat(struct _spmat*, int, double*, int*, int);
+double multRowInVecSpmat(const struct _spmat*, int, const double*, int*, int);
 double getValArray(struct _spmat*, int, int);
 
 
@@ -84,20 +84,16 @@ void free_arr(struct _spmat* A) {
 }
 
 void mult_arr(const struct _spmat* A, const double* v, double* result, int* vertices, int len) {
-	int i, j, k;
+	int j;
 	double sum;
-	void** arrays = (A-> private);
-	double* val = (double*)*(arrays);
-	int* col = (int*)*(arrays + 1);
-	int* rowArray = (int*)*(arrays + 2);
-
+	
 	for (j = 0; j < len; j++) {
 		sum = multRowInVecSpmat(A, vertices[j], v, vertices, len);
 		*(result + j) = sum; 
 	}
 }
 
-double multRowInVecSpmat(struct _spmat* A, int row, double* vector, int* vertices, int sizeOfSub) {
+double multRowInVecSpmat(const struct _spmat* A, int row, const double* vector, int* vertices, int sizeOfSub) {
 	int i, k;
 	double sum = 0;
 	void** arrays = (A-> private);
