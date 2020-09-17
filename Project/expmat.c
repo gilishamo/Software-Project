@@ -6,6 +6,7 @@ void add_degreeExpMat(struct _expmat*, double, int);
 int getDegreeExpMat(struct _expmat*, int);
 double getExpNumOfEdgesExpMat(struct _expmat*, int, int);
 void multExpMat(struct _expmat*, int*, int, const double*, double*);
+double multRowInVecExpmat(expmat*, int, double*, int*, int);
 
 expmat* allocate_expmat(int numOfVertices) {
 	expmat *mat;
@@ -22,6 +23,7 @@ expmat* allocate_expmat(int numOfVertices) {
 	mat->getDegree = &getDegreeExpMat;
 	mat->getExpNumOfEdges = &getExpNumOfEdgesExpMat;
 	mat->mult = &multExpMat;
+	mat->multRowInVec = &multRowInVecExpmat;
 
 	return mat;
 }
@@ -51,22 +53,26 @@ double getExpNumOfEdgesExpMat(struct _expmat* mat, int i, int j) {
 	return ((double)degreeI * (double)degreeJ) / (double)(mat->sumOfDegrees);
 }
 
-
 void multExpMat(struct _expmat* mat, int* verticesOfSub, int sizeOfSub, const double* vector, double* result) {
 	int i, *degreeOfVertex = mat->degreeOfVertex, m = mat->sumOfDegrees;
-	double *myVector, sum;
-
-	myVector = (double*)allocate_memory(sizeOfSub, sizeof(double));
+	double sum = 0;
 
 	for (i = 0; i < sizeOfSub; i++) {
-		*(myVector + i) =(double)*(degreeOfVertex + *(verticesOfSub + i));
+		sum += (double)*(degreeOfVertex + verticesOfSub[i]) * *(vector + i);
 	}
-
-	sum = dotProduct(myVector, vector, sizeOfSub);
 	
 	for (i = 0; i < sizeOfSub; i++) {
-		*(result + i) = (sum * *(myVector + i)) / (double)m;
+		*(result + i) = (sum * (double)(degreeOfVertex[i])) / (double)m;
+	}
+}
+
+double multRowInVecExpmat(expmat* mat, int row, double *vector, int* verticesOfSub, int sizeOfSub) {
+	int i, * degreeOfVertex = mat->degreeOfVertex, m = mat->sumOfDegrees;
+	double sum = 0;
+
+	for (i = 0; i < sizeOfSub; i++) {
+		sum += (double)*(degreeOfVertex + verticesOfSub[i]) * *(vector + i);
 	}
 
-	free(myVector);
+	return (sum * (double)degreeOfVertex[row]) / (double)m;
 }

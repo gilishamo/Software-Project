@@ -68,24 +68,24 @@ void modularityMaximization(double* division, int n, submat* modulMat) {
 
 /* calculates (and updates) the vector score for every k in unmoved */
 int calcScore (double* score, double* division, int* unmoved, int n, submat* modulMat) {
-    int j, k, maxIndex = -1, * vertices = modulMat->vertices; /* k is the node's number in unmoved*/
-    double valA, valD, sum, value, max; /* the value of score[k] */
+    int k, maxIndex = -1, * vertices = modulMat->vertices; /* k is the node's number in unmoved*/
+    double valA, valD, sum, max, value; /* the value of score[k] */
     spmat* A = modulMat->adjMat;
     expmat* D = modulMat->expMat;
 
     for (k = 0; k < n; k++) {
         /* if unmoved[k] == -1 than k isn't in unmoved */
         if (unmoved[k] != -1) {
-            division[k] = -division[k];
-            /* calculation of value: */
             sum = 0;
-            for (j = 0; j < n; j++) {
-                valA = (*A->getVal)(A, vertices[k], vertices[j]);
-                valD = (*D->getExpNumOfEdges)(D, vertices[k], vertices[j]);
-                sum += ((valA - valD) * division[j]);
-            }
+            division[k] = -division[k];
+
+            valA = (*A->multRowInVec)(A, vertices[k], division, vertices, n);
+            valD = (*D->multRowInVec)(D, vertices[k], division, vertices, n);
+            sum = valA - valD;
+
             value = (4 * division[k] * sum) + 4 * (*D->getExpNumOfEdges)(D, vertices[k], vertices[k]);
             score[k] = value;
+
             if (maxIndex == -1) {
                 max = value;
                 maxIndex = k;
@@ -94,6 +94,7 @@ int calcScore (double* score, double* division, int* unmoved, int n, submat* mod
                 max = value;
                 maxIndex = k;
             }
+
             division[k] = -division[k];
         }
     }

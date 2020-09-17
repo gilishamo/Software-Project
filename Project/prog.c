@@ -209,7 +209,7 @@ void  divideNetworkIntoModularityGroups(LinkedList *P, LinkedList *O, spmat * ad
 
 void writeToOutputFile(char* filename, LinkedList *O) {
 	FILE* outputFile;
-	int k, size, i = 1;
+	int k, size;
 	Node* currNode;
 
 	outputFile = fopen(filename, "w");
@@ -222,8 +222,6 @@ void writeToOutputFile(char* filename, LinkedList *O) {
 		traceAndExit(4, "failed to write to file");
 	}
 
-	/*printf("num of clusters= %d\n", *O->len);*/
-
 	currNode = O->head;
 	do {
 		size = currNode->lenOfVertices;
@@ -232,18 +230,11 @@ void writeToOutputFile(char* filename, LinkedList *O) {
 			traceAndExit(4, "failed to write to file");
 		}
 
-		/*printf("size of group %d is %d ", i, size);*/
-		i++;
-
 		k = fwrite(currNode->vertices, sizeof(int), size, outputFile);
 		if (k != size) {
 			traceAndExit(4, "failed to write to file");
 		}
-		/*printf("vertices are: ");
-		for (k = 0; k < size; k++) {
-			printf("%d ", currNode->vertices[k]);
-		}
-		printf("\n");*/
+		
 		currNode = currNode->next;
 
 	} while (currNode != O->head);

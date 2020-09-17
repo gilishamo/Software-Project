@@ -11,7 +11,6 @@ double* divideIntoTwo(submat *modulMat, double * eigenValue) {
 	double* eigenVector, *tempVector, temp, * division;
 	int n = modulMat->sizeOfSub;
 	
-
 	eigenVector = (double*)allocate_memory(n, sizeof(double));
 	division = (double*)allocate_memory(n, sizeof(double));
 	tempVector = (double*)allocate_memory(n, sizeof(double));
@@ -19,7 +18,7 @@ double* divideIntoTwo(submat *modulMat, double * eigenValue) {
 	setAllValues(division, n, 1.0);
 
 	powerIterationWithMatrixShifting(modulMat, eigenVector, eigenValue);
-
+	
 	if (*eigenValue <= EPSILON) {
 		goto end;
 	}
