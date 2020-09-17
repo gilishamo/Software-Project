@@ -27,6 +27,10 @@ typedef struct _expmat {
      * of edges between each vetex i and j of the sub graph */
 	void (*mult)(struct _expmat* mat, int* verticesOfSub, int sizeOfSub, const double* vector, double* result);
 
+	/*Calculates and return the dot product of a single row of mat and vector 
+	 *  by passing the argument verticesOfSub,  mat is the matrix that describes the expected number 
+     * of edges between each vetex i and j of the sub graph 
+	 * row is the index in the original matrix */
 	double (*multRowInVec)(struct _expmat* mat, int row, double* vector, int* verticesOfSub, int sizeOfSub);
 
 	

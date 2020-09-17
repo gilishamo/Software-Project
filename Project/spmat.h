@@ -18,6 +18,9 @@ typedef struct _spmat {
 	/* Returns the value in row i and column j of the original matrix*/
 	double	(*getVal)(struct _spmat* mat, int i, int j);
 
+	/*Calculates and return the dot product of a single row of A and vector
+	 *  by passing the argument vertices,  A is the matrix that describes the adj matrix of the
+	 * the given vertices, row is the index in the original matrix */
 	double (*multRowInVec)(const struct _spmat* A, int row, const double* vector, int* vertices, int sizeOfSub);
 
 	/* Private field for inner implementation.
