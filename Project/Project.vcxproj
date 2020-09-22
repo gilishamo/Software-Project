@@ -139,20 +139,26 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="expmat.c" />
+    <ClCompile Include="modmax.c" />
     <ClCompile Include="prog.c" />
     <ClCompile Include="division.c" />
     <ClCompile Include="linkedlist.c" />
     <ClCompile Include="powerIteration.c" />
     <ClCompile Include="spmat.c" />
     <ClCompile Include="submat.c" />
+    <ClCompile Include="util.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="division.h" />
+    <ClInclude Include="expmat.h" />
     <ClInclude Include="linkedlist.h" />
-    <ClInclude Include="makefile.txt" />
+    <ClInclude Include="makefile" />
+    <ClInclude Include="modmax.h" />
     <ClInclude Include="powerIteration.h" />
     <ClInclude Include="spmat.h" />
     <ClInclude Include="submat.h" />
+    <ClInclude Include="util.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

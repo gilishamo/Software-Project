@@ -5,7 +5,6 @@
 #include "linkedlist.h"
 #include "division.h"
 #include "util.h"
-#include <time.h>
 #include "modmax.h"
 #include "expmat.h"
 
@@ -22,10 +21,6 @@ int main(int argc, char* argv[]) {
 	spmat* adjMatrix;
 	expmat* expNumOfEdgMat;
 	LinkedList* P, * O;
-	time_t start, end;
-	double time;
-
-	start = clock();
 
 	if (argc != 3) {
 		if (argc < 3) {
@@ -80,12 +75,6 @@ int main(int argc, char* argv[]) {
 
 	(*P->free)(P);
 	(*O->free)(O);
-
-	end = clock();
-
-	time = (double)(end - start) / (CLOCKS_PER_SEC);
-
-	printf("my program took %f sec\n" ,time);
 
 	return 0;
 }

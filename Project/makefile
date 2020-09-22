@@ -1,4 +1,4 @@
-FLAGS = -ansi -Wall -Wextra -Werror -pedantic-errors -g
+FLAGS = -ansi -Wall -Wextra -Werror -pedantic-errors
 LIBS = -lm
 
 all: spmat.o linkedlist.o submat.o expmat.o powerIteration.o division.o modmax.o util.o prog.o   
