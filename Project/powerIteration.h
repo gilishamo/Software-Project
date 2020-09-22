@@ -7,7 +7,4 @@
 * eigenVector, eigenValue are pre allocated*/
 void powerIterationWithMatrixShifting(submat* modulMatrix, double* eigenVector, double* eigenValue);\
 
-/*return the dot product of row and len*/
-double dotProduct(double* row, double* col, int len);
-
 #endif 

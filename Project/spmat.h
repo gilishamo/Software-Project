@@ -13,10 +13,15 @@ typedef struct _spmat {
 	void	(*free)(struct _spmat* A);
 
 	/* Multiplies matrix A by vector v, into result (result is pre-allocated) */
-	void	(*mult)(const struct _spmat* A, const double* v, double* result, int* nodes, int len);
+	void	(*mult)(const struct _spmat* A, const double* v, double* result, int* vertices, int len);
 
-	/* returns the value in row i and column j of the original matrix*/
+	/* Returns the value in row i and column j of the original matrix*/
 	double	(*getVal)(struct _spmat* mat, int i, int j);
+
+	/*Calculates and return the dot product of a single row of A and vector
+	 *  by passing the argument vertices,  A is the matrix that describes the adj matrix of the
+	 * the given vertices, row is the index in the original matrix */
+	double (*multRowInVec)(const struct _spmat* A, int row, const double* vector, int* vertices, int sizeOfSub);
 
 	/* Private field for inner implementation.
 	 * Should not be read or modified externally */

@@ -23,6 +23,8 @@ mono_crash.*
 [Rr]eleases/
 x64/
 x86/
+Project/x64/Debug/division.obj
+Project\x86
 [Ww][Ii][Nn]32/
 [Aa][Rr][Mm]/
 [Aa][Rr][Mm]64/
@@ -360,3 +362,13 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+Project/inp
+Project/out
+Project/tester
+Project/319023768_318573425_project.zip
+Project/Tester_Files/
+Project/graph.in
+Project/tester.input
+Project/tester_binary.input
+

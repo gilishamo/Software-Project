@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <time.h>
 #include <math.h>
 #include <stdlib.h>
 #include "spmat.h"
@@ -8,7 +7,9 @@
 void add_arr(struct _spmat*, const double*, int);
 void free_arr(struct _spmat*);
 void mult_arr(const struct _spmat*, const double*, double*, int*, int);
+double multRowInVecSpmat(const struct _spmat*, int, const double*, int*, int);
 double getValArray(struct _spmat*, int, int);
+
 
 spmat* spmat_allocate_array(int n, int nnz) {
 	spmat* spmatArray;
@@ -35,6 +36,7 @@ spmat* spmat_allocate_array(int n, int nnz) {
 	spmatArray->free = &free_arr;
 	spmatArray->mult = &mult_arr;
 	spmatArray->getVal = &getValArray;
+	spmatArray->multRowInVec = &multRowInVecSpmat;
 	spmatArray -> private = arrays;
 
 	(*spmatArray).n = n;
@@ -80,32 +82,39 @@ void free_arr(struct _spmat* A) {
 	return;
 }
 
-void mult_arr(const struct _spmat* A, const double* v, double* result, int* nodes, int len) {
-	int i, j, k;
+void mult_arr(const struct _spmat* A, const double* v, double* result, int* vertices, int len) {
+	int j;
 	double sum;
+	
+	for (j = 0; j < len; j++) {
+		sum = multRowInVecSpmat(A, vertices[j], v, vertices, len);
+		*(result + j) = sum; 
+	}
+}
+
+double multRowInVecSpmat(const struct _spmat* A, int row, const double* vector, int* vertices, int sizeOfSub) {
+	int i, k;
+	double sum = 0;
 	void** arrays = (A-> private);
 	double* val = (double*)*(arrays);
 	int* col = (int*)*(arrays + 1);
 	int* rowArray = (int*)*(arrays + 2);
 
-	for (j = 0; j < len; j++) {
-		sum = 0;
-		k = 0;
-		for (i = *(rowArray + nodes[j]); i < *(rowArray + nodes[j] + 1); i++) {
-			if (k >= len) {
-				break;
-			}
-			while (k < len && *(col + i) > nodes[k]) {
-				k += 1;
-			}
-			if (*(nodes + k) == *(col + i))
-			{
-				sum = sum + (*(val + i)) * (*(v + k));
-				k += 1;
-			}
+	k = 0;
+	for (i = *(rowArray + row); i < *(rowArray + row + 1); i++) {
+		if (k >= sizeOfSub) {
+			break;
 		}
-		*(result + j) = sum; 
+		while (k < sizeOfSub - 1 && *(col + i) > vertices[k]) {
+			k += 1;
+		}
+		if (*(vertices + k) == *(col + i))
+		{
+			sum = sum + (*(val + i)) * (*(vector + k));
+			k += 1;
+		}
 	}
+	return sum;
 }
 
 
@@ -155,6 +164,10 @@ double getValArray(struct _spmat* mat, int i, int j) {
 	for (index = *(rowArray + i); index < *(rowArray + i + 1); index++) {
 		if (*(col + index) == j) {
 			return *(val + index);
+		}
+
+		if (*(col + index) > j) {
+			return 0.0;
 		}
 	}
 

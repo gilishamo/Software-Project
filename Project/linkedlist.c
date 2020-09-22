@@ -10,13 +10,13 @@ void deleteTailLL(struct _LinkedList*);
 void freeLinkedList(struct _LinkedList*);
 void freeNode(struct _Node* node);
 
-Node* allocate_Node(int* nodes, int lenOfNodes, Node* next, Node* prev) {
+Node* allocate_Node(int* vertices, int lenOfVertices, Node* next, Node* prev) {
 	Node* newNode;
 
 	newNode = (Node*)allocate_memory(1, sizeof(Node));
 
-	newNode->nodes = nodes;
-	newNode->lenOfNodes = lenOfNodes;
+	newNode->vertices = vertices;
+	newNode->lenOfVertices = lenOfVertices;
 	newNode->next = next;
 	newNode->prev = prev;
 
@@ -26,7 +26,7 @@ Node* allocate_Node(int* nodes, int lenOfNodes, Node* next, Node* prev) {
 }
 
 void freeNode(struct _Node* node) {
-	free(node->nodes);
+	free(node->vertices);
 	free(node);
 }
 
