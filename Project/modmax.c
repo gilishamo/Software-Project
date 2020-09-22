@@ -4,6 +4,7 @@
 #include "modmax.h"
 #include "util.h"
 
+
 int calcScore(double*, double*, int*, int, submat*);
 
 void modularityMaximization(double* division, int n, submat* modulMat) {
@@ -70,6 +71,7 @@ void modularityMaximization(double* division, int n, submat* modulMat) {
 int calcScore (double* score, double* division, int* unmoved, int n, submat* modulMat) {
     int k, maxIndex = -1, * vertices = modulMat->vertices; /* k is the node's number in unmoved*/
     double valA, valD, sum, max, value; /* the value of score[k] */
+
     spmat* A = modulMat->adjMat;
     expmat* D = modulMat->expMat;
 
@@ -84,6 +86,7 @@ int calcScore (double* score, double* division, int* unmoved, int n, submat* mod
             sum = valA - valD;
 
             value = (4 * division[k] * sum) + 4 * (*D->getExpNumOfEdges)(D, vertices[k], vertices[k]);
+
             score[k] = value;
 
             if (maxIndex == -1) {
